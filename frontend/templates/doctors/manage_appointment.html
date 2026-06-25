@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Manage Appointment{% endblock %}
+{% block content %}
+<div class="d-flex">
+    <div class="sidebar" style="width: 250px; min-width: 250px;">
+        <div class="text-center text-white mb-4 px-3">
+            <i class="fas fa-user-md fa-3x mb-2"></i>
+            <h6>Doctor Panel</h6>
+        </div>
+        <a href="{% url 'doctor_dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+        <a href="{% url 'create_medical_record' %}"><i class="fas fa-notes-medical me-2"></i>Create Record</a>
+        <a href="{% url 'logout_view' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+    </div>
+    <div class="main-content w-100">
+        <h4 class="fw-bold mb-4"><i class="fas fa-calendar me-2 text-primary"></i>Manage Appointment</h4>
+        <div class="card p-4" style="max-width: 600px;">
+            <!-- Appointment Details -->
+            <div class="alert alert-info mb-4">
+                <h6 class="fw-bold"><i class="fas fa-info-circle me-2"></i>Appointment Details</h6>
+                <p class="mb-1"><strong>Patient:</strong> {{ appointment.patient.full_name }}</p>
+                <p class="mb-1"><strong>Date:</strong> {{ appointment.date }}</p>
+                <p class="mb-1"><strong>Time:</strong> {{ appointment.time }}</p>
+                <p class="mb-0"><strong>Reason:</strong> {{ appointment.reason }}</p>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Decision</label>
+                    <select name="action" class="form-select" id="actionSelect" required>
+                        <option value="">-- Choose Action --</option>
+                        <option value="approve">✅ Approve Appointment</option>
+                        <option value="decline">❌ Decline Appointment</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="declineReasonDiv" style="display:none;">
+                    <label class="form-label fw-bold text-danger">Reason for Declining</label>
+                    <textarea name="decline_reason" class="form-control" rows="3"
+                        placeholder="Please provide a reason for declining..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="fas fa-save me-2"></i>Submit Decision
+                </button>
+                <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary ms-2">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('actionSelect').addEventListener('change', function() {
+        const declineDiv = document.getElementById('declineReasonDiv');
+        declineDiv.style.display = this.value === 'decline' ? 'block' : 'none';
+        declineDiv.querySelector('textarea').required = this.value === 'decline';
+    });
+</script>
+{% endblock %}

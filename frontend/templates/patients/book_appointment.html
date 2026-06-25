@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Book Appointment — PLASU Health Access{% endblock %}
+
+{% block extra_head %}
+<style>
+.book-page {
+    min-height: 100vh;
+    position: relative;
+    background:
+        linear-gradient(155deg, rgba(11,25,17,0.95) 0%, rgba(20,58,38,0.90) 50%, rgba(8,18,12,0.97) 100%),
+        url("{% static 'images/clinic-bg.jpg' %}") center / cover no-repeat fixed;
+}
+.book-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+    background-size: 55px 55px;
+    pointer-events: none;
+}
+.book-orb-1 {
+    position: fixed; top: -140px; right: -140px;
+    width: 520px; height: 520px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,197,58,0.08) 0%, transparent 65%);
+    pointer-events: none; z-index: 0;
+}
+.book-orb-2 {
+    position: fixed; bottom: -100px; left: 180px;
+    width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(43,114,88,0.14) 0%, transparent 65%);
+    pointer-events: none; z-index: 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="book-page">
+  <div class="book-orb-1"></div>
+  <div class="book-orb-2"></div>
+
+  <div style="position:relative;z-index:1;display:flex;min-height:100vh;">
+
+    <!-- SIDEBAR -->
+    <div class="plasu-sidebar" style="width:260px;min-width:260px;">
+      <div class="plasu-brand">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU" class="plasu-brand-logo">
+          <div>
+            <div class="plasu-brand-name">PLASU</div>
+            <div class="plasu-brand-sub">Health Access System</div>
+          </div>
+        </div>
+        <div class="plasu-user-pill">
+          <div class="plasu-user-avatar" style="background:linear-gradient(135deg,#2B7258,#FFC53A);">
+            <i class="fas fa-user" style="font-size:0.85rem;"></i>
+          </div>
+          <div>
+            <div class="plasu-user-name">{{ patient.full_name }}</div>
+            <div class="plasu-user-role">Patient Portal</div>
+          </div>
+        </div>
+      </div>
+      <nav class="px-3 py-3">
+        <div class="plasu-nav-section">Main Menu</div>
+        <a href="{% url 'patient_dashboard' %}" class="plasu-nav-link">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{% url 'book_appointment' %}" class="plasu-nav-link active">
+          <i class="fas fa-calendar-plus"></i> Book Appointment
+        </a>
+        <a href="{% url 'virtual_card' %}" class="plasu-nav-link">
+          <i class="fas fa-id-card"></i> My Health Card
+        </a>
+        <div class="plasu-nav-section mt-3">Account</div>
+        <a href="{% url 'logout_view' %}" class="plasu-nav-link plasu-nav-logout mt-1">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </nav>
+    </div>
+
+    <!-- MAIN -->
+    <div class="plasu-main">
+      <div class="plasu-topbar">
+        <div>
+          <div class="plasu-topbar-sub">Appointments</div>
+          <h4 class="plasu-topbar-title">Book Appointment</h4>
+        </div>
+        <a href="{% url 'patient_dashboard' %}" class="plasu-action-btn-ghost">
+          <i class="fas fa-arrow-left me-2"></i> Back
+        </a>
+      </div>
+
+      <div class="plasu-form-card" style="max-width:620px;">
+
+        <div style="text-align:center;margin-bottom:28px;">
+          <div style="display:inline-flex;width:58px;height:58px;border-radius:50%;
+            background:linear-gradient(135deg,#e65100,#ef6c00);
+            align-items:center;justify-content:center;margin-bottom:12px;
+            box-shadow:0 6px 20px rgba(239,108,0,0.3);">
+            <i class="fas fa-calendar-plus" style="font-size:1.4rem;color:#fff;"></i>
+          </div>
+          <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:4px;">
+            Schedule a Visit
+          </div>
+          <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);">
+            Fill in the details below to book a clinic appointment
+          </div>
+        </div>
+
+        <form method="POST">
+          {% csrf_token %}
+
+          <!-- Doctor -->
+          <div class="plasu-form-group">
+            <label class="plasu-label">
+              <i class="fas fa-user-md me-1" style="color:rgba(255,197,58,0.6);"></i>
+              Select Doctor
+            </label>
+            <div class="plasu-input-group">
+              <span class="plasu-input-icon"><i class="fas fa-user-md"></i></span>
+              <select name="doctor" class="plasu-select" required
+                style="-webkit-appearance:none;-moz-appearance:none;appearance:none;">
+                <option value="">— Select a doctor —</option>
+                {% for doctor in doctors %}
+                <option value="{{ doctor.id }}">Dr. {{ doctor.username }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- Date & Time -->
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="plasu-form-group">
+                <label class="plasu-label">
+                  <i class="fas fa-calendar me-1" style="color:rgba(255,197,58,0.6);"></i>
+                  Preferred Date
+                </label>
+                <div class="plasu-input-group">
+                  <span class="plasu-input-icon"><i class="fas fa-calendar"></i></span>
+                  <input type="date" name="date" class="plasu-input" required
+                    style="color-scheme:dark;">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="plasu-form-group">
+                <label class="plasu-label">
+                  <i class="fas fa-clock me-1" style="color:rgba(255,197,58,0.6);"></i>
+                  Preferred Time
+                </label>
+                <div class="plasu-input-group">
+                  <span class="plasu-input-icon"><i class="fas fa-clock"></i></span>
+                  <input type="time" name="time" class="plasu-input" required
+                    style="color-scheme:dark;">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reason -->
+          <div class="plasu-form-group">
+            <label class="plasu-label">
+              <i class="fas fa-notes-medical me-1" style="color:rgba(255,197,58,0.6);"></i>
+              Reason for Visit
+            </label>
+            <textarea name="reason" rows="4" required
+              style="width:100%;background:rgba(255,255,255,0.06);
+                     border:1px solid rgba(255,255,255,0.1);
+                     border-radius:11px;padding:13px 16px;
+                     color:#fff;font-family:'DM Sans',sans-serif;
+                     font-size:0.86rem;resize:vertical;outline:none;
+                     transition:border-color 0.2s,box-shadow 0.2s;"
+              placeholder="Briefly describe your reason for visiting the clinic…"
+              onfocus="this.style.borderColor='rgba(43,114,88,0.6)';this.style.boxShadow='0 0 0 3px rgba(43,114,88,0.12)'"
+              onblur="this.style.borderColor='rgba(255,255,255,0.1)';this.style.boxShadow='none'"></textarea>
+          </div>
+
+          <!-- Info note -->
+          <div style="background:rgba(43,114,88,0.1);border:1px solid rgba(43,114,88,0.2);
+                      border-left:3px solid var(--plasu-green-light);border-radius:10px;
+                      padding:11px 15px;margin-bottom:22px;font-size:0.78rem;
+                      color:rgba(255,255,255,0.6);">
+            <i class="fas fa-info-circle me-2" style="color:var(--plasu-green-light);"></i>
+            Your appointment request will be reviewed by the doctor. You will be notified of the decision on your dashboard.
+          </div>
+
+          <div class="d-flex gap-3">
+            <button type="submit" class="plasu-action-btn" style="padding:12px 32px;font-size:0.9rem;">
+              <i class="fas fa-calendar-check me-2"></i> Book Appointment
+            </button>
+            <a href="{% url 'patient_dashboard' %}" class="plasu-action-btn-ghost" style="padding:12px 20px;">
+              Cancel
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% include 'partials/plasu_dashboard_styles.html' %}
+{% endblock %}
+

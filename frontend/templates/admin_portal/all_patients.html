@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}All Patients — PLASU Health Access{% endblock %}
+
+{% block content %}
+<div class="plasu-page-bg">
+  <div class="plasu-overlay"></div>
+  <div class="plasu-orb-gold"></div>
+  <div class="plasu-orb-green"></div>
+
+  <div class="plasu-layout">
+
+    <!-- SIDEBAR -->
+    <div class="plasu-sidebar" style="width:260px;min-width:260px;">
+      <div class="plasu-brand">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU" class="plasu-brand-logo">
+          <div><div class="plasu-brand-name">PLASU</div><div class="plasu-brand-sub">Health Access System</div></div>
+        </div>
+        <div class="plasu-user-pill">
+          <div class="plasu-user-avatar" style="background:linear-gradient(135deg,#2B7258,#FFC53A);">
+            <i class="fas fa-user-shield" style="font-size:0.85rem;"></i>
+          </div>
+          <div>
+            <div class="plasu-user-name">{{ request.user.username }}</div>
+            <div class="plasu-user-role">Administrator</div>
+          </div>
+        </div>
+      </div>
+      <nav class="px-3 py-3">
+        <div class="plasu-nav-section">Main Menu</div>
+        <a href="{% url 'admin_dashboard' %}" class="plasu-nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{% url 'all_patients' %}" class="plasu-nav-link active"><i class="fas fa-users"></i> All Patients</a>
+        <a href="{% url 'all_doctors' %}" class="plasu-nav-link"><i class="fas fa-user-md"></i> All Doctors</a>
+        <div class="plasu-nav-section mt-3">Management</div>
+        <a href="{% url 'create_admin' %}" class="plasu-nav-link"><i class="fas fa-user-shield"></i> Create Admin</a>
+        <a href="{% url 'create_doctor' %}" class="plasu-nav-link"><i class="fas fa-user-plus"></i> Create Doctor</a>
+        <a href="{% url 'create_patient' %}" class="plasu-nav-link"><i class="fas fa-user-plus"></i> Create Patient</a>
+        <div class="plasu-nav-section mt-3">Account</div>
+        <a href="{% url 'change_password' %}" class="plasu-nav-link"><i class="fas fa-key"></i> Change Password</a>
+        <a href="{% url 'logout_view' %}" class="plasu-nav-link plasu-nav-logout mt-1"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </nav>
+    </div>
+
+    <!-- MAIN -->
+    <div class="plasu-main">
+      <div class="plasu-topbar">
+        <div>
+          <div class="plasu-topbar-sub">Registry</div>
+          <h4 class="plasu-topbar-title">All Patients</h4>
+        </div>
+        <a href="{% url 'create_patient' %}" class="plasu-action-btn">
+          <i class="fas fa-user-plus me-2"></i> Add Patient
+        </a>
+      </div>
+
+      <div class="plasu-glass-card">
+        <div class="plasu-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#2B7258,#3d9970);
+              display:flex;align-items:center;justify-content:center;">
+              <i class="fas fa-users" style="font-size:0.78rem;color:#fff;"></i>
+            </div>
+            <span>Registered Patients</span>
+          </div>
+          <span class="plasu-badge-count">{{ patients|length }}</span>
+        </div>
+        <div class="plasu-card-body">
+
+          <!-- Search -->
+          <form method="GET" class="mb-4">
+            <div class="d-flex gap-2">
+              <div class="plasu-input-group flex-grow-1">
+                <span class="plasu-input-icon"><i class="fas fa-search"></i></span>
+                <input type="text" name="search" class="plasu-input"
+                  placeholder="Search by name or matric number…"
+                  value="{{ search }}">
+              </div>
+              <button class="plasu-action-btn" type="submit" style="padding:10px 20px;">
+                <i class="fas fa-search me-1"></i> Search
+              </button>
+              {% if search %}
+              <a href="{% url 'all_patients' %}" class="plasu-action-btn-ghost" style="padding:10px 16px;">Clear</a>
+              {% endif %}
+            </div>
+          </form>
+
+          <div class="table-responsive">
+            <table class="plasu-table">
+              <thead>
+                <tr>
+                  <th>Full Name</th><th>Username</th><th>Matric No</th>
+                  <th>Phone</th><th>Smartcard</th><th>Biometric</th><th>Status</th><th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for patient in patients %}
+              <tr>
+                <td><span style="font-weight:600;color:#fff;">{{ patient.full_name }}</span></td>
+                <td style="color:rgba(255,255,255,0.65);">{{ patient.user.username }}</td>
+                <td style="color:rgba(255,255,255,0.65);">{{ patient.matric_number }}</td>
+                <td style="color:rgba(255,255,255,0.65);">{{ patient.phone }}</td>
+
+                {# ── Smartcard ── #}
+                <td>
+                  {% if patient.smartcard_id %}
+                  <span class="plasu-badge plasu-badge-success">{{ patient.smartcard_id }}</span>
+                  {% else %}
+                  <span class="plasu-badge plasu-badge-danger">Not Assigned</span>
+                  {% endif %}
+                </td>
+
+                {# ── Biometric ── #}
+                <td>
+                  {% if patient.biometric_pin %}
+                  <span class="plasu-badge plasu-badge-success">Assigned</span>
+                  {% else %}
+                  <span class="plasu-badge plasu-badge-danger">Not Assigned</span>
+                  {% endif %}
+                </td>
+
+                {# ── Account Status Badge ── #}
+                <td>
+                  {% if patient.account_status == 'active' %}
+                  <span class="plasu-badge badge-active">&#9679; Active</span>
+                  {% elif patient.account_status == 'suspended' %}
+                  <span class="plasu-badge badge-suspended">&#9679; Suspended</span>
+                  {% elif patient.account_status == 'deactivated' %}
+                  <span class="plasu-badge badge-deactivated">&#9679; Deactivated</span>
+                  {% else %}
+                  <span class="plasu-badge badge-active">&#9679; Active</span>
+                  {% endif %}
+                </td>
+
+                {# ── Action Buttons ── #}
+                <td>
+                  <div class="d-flex gap-1 flex-wrap">
+
+                    {# Assign credentials — always available #}
+                    <a href="{% url 'assign_credentials' patient.id %}" class="plasu-action-btn"
+                      style="font-size:0.72rem;padding:5px 10px;"
+                      title="Assign Smartcard / Biometric">
+                      <i class="fas fa-key"></i>
+                    </a>
+
+                    {# Reactivate (if suspended or deactivated) #}
+                    {% if patient.account_status == 'suspended' or patient.account_status == 'deactivated' %}
+                    <a href="{% url 'reactivate_patient' patient.id %}" class="plasu-action-btn"
+                      style="font-size:0.72rem;padding:5px 10px;background:linear-gradient(135deg,#2B7258,#3d9970);"
+                      title="Reactivate Account">
+                      <i class="fas fa-user-check"></i>
+                    </a>
+                    {% endif %}
+
+                    {# Suspend (if active or deactivated) #}
+                    {% if patient.account_status != 'suspended' %}
+                    <a href="{% url 'suspend_patient' patient.id %}" class="plasu-action-btn"
+                      style="font-size:0.72rem;padding:5px 10px;background:linear-gradient(135deg,#e65100,#ef6c00);"
+                      title="Suspend Account">
+                      <i class="fas fa-pause-circle"></i>
+                    </a>
+                    {% endif %}
+
+                    {# Deactivate (if active or suspended) #}
+                    {% if patient.account_status != 'deactivated' %}
+                    <a href="{% url 'deactivate_patient' patient.id %}" class="plasu-action-btn"
+                      style="font-size:0.72rem;padding:5px 10px;background:linear-gradient(135deg,#b71c1c,#e53935);"
+                      title="Deactivate Account">
+                      <i class="fas fa-user-times"></i>
+                    </a>
+                    {% endif %}
+
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="8" class="text-center py-4" style="color:rgba(255,255,255,0.45);">
+                  No patients found.
+                </td>
+              </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% include 'partials/plasu_dashboard_styles.html' %}
+{% endblock %}

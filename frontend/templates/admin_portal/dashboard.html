@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Admin Dashboard — PLASU Health Access System{% endblock %}
+
+{% block content %}
+<div class="plasu-page-bg">
+  <div class="plasu-overlay"></div>
+  <div class="plasu-orb-gold"></div>
+  <div class="plasu-orb-green"></div>
+
+  <div class="plasu-layout">
+
+    <!-- SIDEBAR -->
+    <div class="plasu-sidebar" style="width:260px;min-width:260px;">
+      <div class="plasu-brand">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU" class="plasu-brand-logo">
+          <div>
+            <div class="plasu-brand-name">PLASU</div>
+            <div class="plasu-brand-sub">Health Access System</div>
+          </div>
+        </div>
+        <div class="plasu-user-pill">
+          <div class="plasu-user-avatar" style="background:linear-gradient(135deg,#2B7258,#FFC53A);">
+            <i class="fas fa-user-shield" style="font-size:0.85rem;"></i>
+          </div>
+          <div>
+            <div class="plasu-user-name">{{ request.user.username }}</div>
+            <div class="plasu-user-role">Administrator</div>
+          </div>
+        </div>
+      </div>
+      <nav class="px-3 py-3">
+        <div class="plasu-nav-section">Main Menu</div>
+        <a href="{% url 'admin_dashboard' %}" class="plasu-nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{% url 'all_patients' %}" class="plasu-nav-link"><i class="fas fa-users"></i> All Patients</a>
+        <a href="{% url 'all_doctors' %}" class="plasu-nav-link"><i class="fas fa-user-md"></i> All Doctors</a>
+        <div class="plasu-nav-section mt-3">Management</div>
+        <a href="{% url 'create_admin' %}" class="plasu-nav-link"><i class="fas fa-user-shield"></i> Create Admin</a>
+        <a href="{% url 'create_doctor' %}" class="plasu-nav-link"><i class="fas fa-user-plus"></i> Create Doctor</a>
+        <a href="{% url 'create_patient' %}" class="plasu-nav-link"><i class="fas fa-user-plus"></i> Create Patient</a>
+        <div class="plasu-nav-section mt-3">Account</div>
+        <a href="{% url 'change_password' %}" class="plasu-nav-link"><i class="fas fa-key"></i> Change Password</a>
+        <a href="{% url 'logout_view' %}" class="plasu-nav-link plasu-nav-logout mt-1"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </nav>
+    </div>
+
+    <!-- MAIN -->
+    <div class="plasu-main">
+
+      <div class="plasu-topbar">
+        <div>
+          <div class="plasu-topbar-sub">Overview</div>
+          <h4 class="plasu-topbar-title">Admin Dashboard</h4>
+        </div>
+        <div class="plasu-topbar-date">
+          <i class="fas fa-clock me-1" style="color:var(--plasu-gold);"></i>
+          {% now "l, d M Y" %}
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+          <div class="plasu-stat-card">
+            <div class="plasu-stat-icon" style="background:linear-gradient(135deg,#2B7258,#3d9970);"><i class="fas fa-users"></i></div>
+            <div class="plasu-stat-num">{{ total_patients }}</div>
+            <div class="plasu-stat-label">Total Students</div>
+            <div class="plasu-stat-bar" style="background:rgba(43,114,88,0.4);"></div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="plasu-stat-card">
+            <div class="plasu-stat-icon" style="background:linear-gradient(135deg,#1565c0,#1e88e5);"><i class="fas fa-user-md"></i></div>
+            <div class="plasu-stat-num">{{ total_doctors }}</div>
+            <div class="plasu-stat-label">Total Doctors</div>
+            <div class="plasu-stat-bar" style="background:rgba(30,136,229,0.4);"></div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="plasu-stat-card">
+            <div class="plasu-stat-icon" style="background:linear-gradient(135deg,#e65100,#ef6c00);"><i class="fas fa-id-card"></i></div>
+            <div class="plasu-stat-num">{{ patients_no_card.count }}</div>
+            <div class="plasu-stat-label">No Smartcard</div>
+            <div class="plasu-stat-bar" style="background:rgba(239,108,0,0.4);"></div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="plasu-stat-card">
+            <div class="plasu-stat-icon" style="background:linear-gradient(135deg,#b71c1c,#e53935);"><i class="fas fa-fingerprint"></i></div>
+            <div class="plasu-stat-num">{{ patients_no_biometric.count }}</div>
+            <div class="plasu-stat-label">No Biometric</div>
+            <div class="plasu-stat-bar" style="background:rgba(229,57,53,0.4);"></div>
+          </div>
+        </div>
+      </div>
+
+      {% if patients_no_card or patients_no_biometric %}
+      <div class="plasu-alert-warning mb-4">
+        <i class="fas fa-exclamation-triangle me-2" style="color:var(--plasu-gold);"></i>
+        <strong style="color:var(--plasu-gold);">Reminder:</strong>
+        <span style="color:rgba(255,255,255,0.75);"> Some students are still missing a smartcard or biometric PIN.</span>
+      </div>
+      {% endif %}
+
+      <!-- Pending Credentials Table -->
+      <div class="plasu-glass-card">
+        <div class="plasu-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#FFC53A,#e0a800);
+              display:flex;align-items:center;justify-content:center;">
+              <i class="fas fa-clock" style="font-size:0.8rem;color:#1a3a2a;"></i>
+            </div>
+            <span>Patients Pending Credential Assignment</span>
+          </div>
+          <span class="plasu-badge-count">{{ patients_no_biometric|length }}</span>
+        </div>
+        <div class="plasu-card-body">
+          <div class="table-responsive">
+            <table class="plasu-table">
+              <thead>
+                <tr>
+                  <th>Full Name</th><th>Username</th><th>Phone</th>
+                  <th>Smartcard</th><th>Biometric</th><th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for patient in patients_no_biometric %}
+                <tr>
+                  <td><span style="font-weight:600;color:#fff;">{{ patient.full_name }}</span></td>
+                  <td>{{ patient.user.username }}</td>
+                  <td>{{ patient.phone }}</td>
+                  <td>
+                    {% if patient.smartcard_id %}
+                    <span class="plasu-badge plasu-badge-success">{{ patient.smartcard_id }}</span>
+                    {% else %}
+                    <span class="plasu-badge plasu-badge-danger">Not Assigned</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if patient.biometric_pin %}
+                    <span class="plasu-badge plasu-badge-success">Assigned</span>
+                    {% else %}
+                    <span class="plasu-badge plasu-badge-danger">Not Assigned</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="{% url 'assign_credentials' patient.id %}" class="plasu-action-btn">
+                      <i class="fas fa-key me-1"></i> Assign
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-4">
+                    <i class="fas fa-check-circle me-2" style="color:#3d9970;font-size:1.1rem;"></i>
+                    <span style="color:rgba(255,255,255,0.45);">All patients have credentials assigned!</span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div>
+</div>
+
+{% include 'partials/plasu_dashboard_styles.html' %}
+{% endblock %}

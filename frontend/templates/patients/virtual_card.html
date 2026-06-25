@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Virtual Health Card — {{ patient.full_name }}{% endblock %}
+
+{% block extra_head %}
+<style>
+.card-page {
+    min-height: 100vh;
+    position: relative;
+    background:
+        linear-gradient(155deg, rgba(11,25,17,0.95) 0%, rgba(20,58,38,0.90) 50%, rgba(8,18,12,0.97) 100%),
+        url("{% static 'images/clinic-bg.jpg' %}") center / cover no-repeat fixed;
+}
+.card-orb-1 {
+    position: fixed; top: -140px; right: -140px;
+    width: 520px; height: 520px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,197,58,0.08) 0%, transparent 65%);
+    pointer-events: none; z-index: 0;
+}
+.card-orb-2 {
+    position: fixed; bottom: -100px; left: 180px;
+    width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(43,114,88,0.14) 0%, transparent 65%);
+    pointer-events: none; z-index: 0;
+}
+.health-card-front {
+    background: linear-gradient(135deg, #0e3d24 0%, #1E6B45 45%, #0b2918 100%);
+    border-radius: 22px;
+    padding: 28px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+    max-width: 460px;
+    margin: 0 auto;
+}
+.health-card-back {
+    background: linear-gradient(135deg, #f0f4f0 0%, #e4ede4 100%);
+    border-radius: 22px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    max-width: 460px;
+    margin: 0 auto;
+}
+.card-watermark {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 220px; height: 220px;
+    object-fit: contain;
+    opacity: 0.07;
+    pointer-events: none;
+    z-index: 0;
+}
+.card-watermark-back {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px; height: 200px;
+    object-fit: contain;
+    opacity: 0.09;
+    pointer-events: none;
+    z-index: 0;
+    filter: invert(0.3) sepia(1) saturate(2) hue-rotate(90deg);
+}
+.card-content { position: relative; z-index: 1; }
+@media print {
+    .plasu-sidebar, .plasu-topbar, button, .no-print { display: none !important; }
+    .plasu-main { padding: 0 !important; }
+    body { background: white !important; }
+    .card-page { background: white !important; }
+    .health-card-front, .health-card-back { box-shadow: none !important; border: 1px solid #ccc; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card-page">
+  <div class="card-orb-1"></div>
+  <div class="card-orb-2"></div>
+
+  <div style="position:relative;z-index:1;display:flex;min-height:100vh;">
+
+    <!-- SIDEBAR -->
+    <div class="plasu-sidebar" style="width:260px;min-width:260px;">
+      <div class="plasu-brand">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU" class="plasu-brand-logo">
+          <div><div class="plasu-brand-name">PLASU</div><div class="plasu-brand-sub">Health Access System</div></div>
+        </div>
+        <div class="plasu-user-pill">
+          <div class="plasu-user-avatar" style="background:linear-gradient(135deg,#2B7258,#FFC53A);">
+            <i class="fas fa-user" style="font-size:0.85rem;"></i>
+          </div>
+          <div>
+            <div class="plasu-user-name">{{ patient.full_name }}</div>
+            <div class="plasu-user-role">Patient Portal</div>
+          </div>
+        </div>
+      </div>
+      <nav class="px-3 py-3">
+        <div class="plasu-nav-section">Main Menu</div>
+        <a href="{% url 'patient_dashboard' %}" class="plasu-nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{% url 'book_appointment' %}" class="plasu-nav-link"><i class="fas fa-calendar-plus"></i> Book Appointment</a>
+        <a href="{% url 'virtual_card' %}" class="plasu-nav-link active"><i class="fas fa-id-card"></i> My Health Card</a>
+        <div class="plasu-nav-section mt-3">Account</div>
+        <a href="{% url 'logout_view' %}" class="plasu-nav-link plasu-nav-logout mt-1"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </nav>
+    </div>
+
+    <!-- MAIN -->
+    <div class="plasu-main">
+      <div class="plasu-topbar no-print">
+        <div>
+          <div class="plasu-topbar-sub">Identity</div>
+          <h4 class="plasu-topbar-title">Virtual Health Card</h4>
+        </div>
+        <button onclick="window.print()" class="plasu-action-btn">
+          <i class="fas fa-print me-2"></i> Print Card
+        </button>
+      </div>
+
+      <div id="printArea">
+        <div class="row justify-content-center g-4">
+
+          <!-- FRONT -->
+          <div class="col-lg-5 col-md-8 col-sm-10">
+            <div style="font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;
+                        letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;" class="no-print">
+              — Front of Card —
+            </div>
+            <div class="health-card-front">
+
+              <!-- WATERMARK -->
+              <img src="{% static 'images/plasu_logo.png' %}" alt="" class="card-watermark">
+
+              <!-- Gold top stripe -->
+              <div style="position:absolute;top:0;left:0;right:0;height:3px;
+                background:linear-gradient(90deg,transparent,#FFC53A,transparent);"></div>
+
+              <div class="card-content">
+                <!-- Header -->
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+                  <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU"
+                    style="width:50px;height:50px;object-fit:contain;background:#fff;
+                           border-radius:50%;padding:4px;box-shadow:0 3px 12px rgba(0,0,0,0.3);flex-shrink:0;">
+                  <div>
+                    <div style="font-family:'Playfair Display',serif;font-size:0.78rem;font-weight:700;
+                                letter-spacing:1.2px;color:#fff;text-transform:uppercase;">
+                      Plateau State University
+                    </div>
+                    <div style="font-size:0.68rem;color:var(--plasu-gold);">Student Health Access Card</div>
+                    <div style="font-size:0.6rem;color:rgba(255,255,255,0.4);">Bokkos, Plateau State · Nigeria</div>
+                  </div>
+                </div>
+
+                <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);margin-bottom:16px;"></div>
+
+                <!-- Name -->
+                <div style="margin-bottom:14px;">
+                  <div style="font-size:0.6rem;color:rgba(255,197,58,0.65);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px;">Full Name</div>
+                  <div style="font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:#fff;">{{ patient.full_name }}</div>
+                </div>
+
+                <!-- Details grid -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                  <div>
+                    <div style="font-size:0.58rem;color:rgba(255,197,58,0.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Matric Number</div>
+                    <div style="font-size:0.76rem;font-weight:600;font-family:'DM Mono',monospace;color:#fff;">{{ patient.matric_number }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:0.58rem;color:rgba(255,197,58,0.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Faculty</div>
+                    <div style="font-size:0.76rem;font-weight:600;color:#fff;">{{ patient.get_faculty_display }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:0.58rem;color:rgba(255,197,58,0.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Gender</div>
+                    <div style="font-size:0.76rem;color:rgba(255,255,255,0.8);">{{ patient.gender|capfirst }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:0.58rem;color:rgba(255,197,58,0.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Date of Birth</div>
+                    <div style="font-size:0.76rem;color:rgba(255,255,255,0.8);">{{ patient.date_of_birth }}</div>
+                  </div>
+                </div>
+
+                <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);margin-bottom:14px;"></div>
+
+                <!-- Card ID -->
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>
+                    <div style="font-size:0.58rem;color:rgba(255,197,58,0.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Card ID</div>
+                    {% if patient.smartcard_id %}
+                    <div style="font-family:'DM Mono',monospace;font-size:1rem;font-weight:700;color:var(--plasu-gold);letter-spacing:2px;">{{ patient.smartcard_id }}</div>
+                    {% else %}
+                    <div style="font-size:0.8rem;color:rgba(255,255,255,0.35);font-style:italic;">Pending Assignment</div>
+                    {% endif %}
+                  </div>
+                  <div style="width:42px;height:42px;border-radius:50%;background:rgba(255,197,58,0.1);
+                    border:1px solid rgba(255,197,58,0.25);display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-shield-alt" style="color:rgba(255,197,58,0.5);font-size:1rem;"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BACK -->
+          <div class="col-lg-5 col-md-8 col-sm-10">
+            <div style="font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;
+                        letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;" class="no-print">
+              — Back of Card —
+            </div>
+            <div class="health-card-back">
+
+              <!-- WATERMARK -->
+              <img src="{% static 'images/plasu_logo.png' %}" alt="" class="card-watermark-back">
+
+              <!-- Green top stripe -->
+              <div style="position:absolute;top:0;left:0;right:0;height:3px;
+                background:linear-gradient(90deg,#1E6B45,#FFC53A,#1E6B45);"></div>
+
+              <div class="card-content">
+                <!-- Magnetic strip -->
+                <div style="background:linear-gradient(135deg,#1a1a1a,#2a2a2a);height:44px;
+                  border-radius:6px;margin-bottom:20px;display:flex;align-items:center;
+                  padding:0 16px;gap:8px;">
+                  <div style="flex:1;height:2px;background:rgba(255,255,255,0.08);"></div>
+                  <div style="font-size:0.58rem;color:rgba(255,255,255,0.25);letter-spacing:2px;text-transform:uppercase;">Magnetic Strip</div>
+                  <div style="flex:1;height:2px;background:rgba(255,255,255,0.08);"></div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                  <div>
+                    <div style="font-size:0.6rem;color:#2B7258;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Phone</div>
+                    <div style="font-size:0.82rem;font-weight:600;color:#1a3a2a;">{{ patient.phone }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:0.6rem;color:#2B7258;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Biometric</div>
+                    {% if patient.biometric_pin %}
+                    <div style="font-size:0.82rem;font-weight:700;color:#1e6b45;">✅ Registered</div>
+                    {% else %}
+                    <div style="font-size:0.82rem;font-weight:700;color:#c0392b;">❌ Not Registered</div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div style="margin-bottom:16px;">
+                  <div style="font-size:0.6rem;color:#2B7258;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Address</div>
+                  <div style="font-size:0.82rem;color:#2a3a2a;line-height:1.4;">{{ patient.address }}</div>
+                </div>
+
+                <div style="height:1px;background:rgba(43,114,88,0.2);margin-bottom:16px;"></div>
+
+                <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;">
+                  <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU"
+                    style="width:32px;height:32px;object-fit:contain;border-radius:50%;">
+                  <div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#1a3a2a;font-family:'Playfair Display',serif;">Plateau State University</div>
+                    <div style="font-size:0.62rem;color:#2B7258;">Health Access System</div>
+                  </div>
+                </div>
+
+                <div style="text-align:center;font-size:0.64rem;color:#888;line-height:1.7;">
+                  If found, please return to the university clinic.<br>
+                  Card ID: <strong style="font-family:'DM Mono',monospace;color:#1E6B45;">{{ patient.smartcard_id|default:"Pending" }}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include 'partials/plasu_dashboard_styles.html' %}
+{% endblock %}

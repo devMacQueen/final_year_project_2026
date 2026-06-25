@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ action }} Account — PLASU Health Access System{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex flex-column" style="
+  background: url('{% static 'images/clinic_bg.jpg' %}') center center / cover no-repeat;
+  position: relative;">
+
+  <div style="position:absolute;inset:0;
+    background:linear-gradient(135deg,rgba(15,40,28,0.94) 0%,rgba(26,82,57,0.88) 50%,rgba(12,30,20,0.97) 100%);
+    z-index:0;"></div>
+  <div style="position:absolute;top:-100px;right:-100px;width:420px;height:420px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,197,58,0.10) 0%,transparent 70%);z-index:0;pointer-events:none;"></div>
+
+  <!-- Navbar -->
+  <div style="position:relative;z-index:2;border-bottom:1px solid rgba(255,255,255,0.1);">
+    <div class="container py-3 d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-3">
+        <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU"
+          style="width:44px;height:44px;object-fit:contain;background:#fff;border-radius:50%;padding:4px;
+                 box-shadow:0 2px 12px rgba(255,197,58,0.4);">
+        <div>
+          <div style="font-family:'Georgia',serif;font-size:0.72rem;color:#FFC53A;letter-spacing:2px;text-transform:uppercase;font-weight:700;">PLASU</div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.55);">Admin Panel</div>
+        </div>
+      </div>
+      <a href="{% url cancel_url %}" style="font-size:0.8rem;color:rgba(255,255,255,0.6);text-decoration:none;">
+        <i class="fas fa-arrow-left me-1"></i> Back
+      </a>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="container d-flex align-items-center justify-content-center flex-grow-1 py-5"
+    style="position:relative;z-index:2;">
+    <div style="width:100%;max-width:500px;">
+
+      <!-- Icon header -->
+      <div class="text-center mb-3" style="animation:fadeDown 0.7s ease both;">
+        <div style="width:84px;height:84px;border-radius:50%;margin:0 auto 14px;
+          {% if action_color == 'warning' %}
+          background:rgba(255,197,58,0.15);border:1.5px solid rgba(255,197,58,0.45);
+          box-shadow:0 0 28px rgba(255,197,58,0.2),0 8px 24px rgba(0,0,0,0.3);
+          {% else %}
+          background:rgba(220,53,69,0.15);border:1.5px solid rgba(220,53,69,0.45);
+          box-shadow:0 0 28px rgba(220,53,69,0.2),0 8px 24px rgba(0,0,0,0.3);
+          {% endif %}
+          backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;">
+          <i class="fas {{ icon }}"
+            style="font-size:1.9rem;color:{% if action_color == 'warning' %}#FFC53A{% else %}#ff8a8a{% endif %};"></i>
+        </div>
+        <h5 style="font-family:'Georgia',serif;font-weight:700;color:#fff;margin-bottom:4px;">
+          {{ action }} Account
+        </h5>
+        <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin:0;">
+          PLASU Health Access System — Admin Action
+        </p>
+      </div>
+
+      <!-- Glass panel -->
+      <div class="aa-panel p-4" style="animation:fadeUp 0.8s 0.1s ease both;">
+
+        <!-- Target info box -->
+        <div class="text-center py-3 px-3 mb-4"
+          style="background:rgba(255,255,255,0.06);border-radius:14px;border:1px solid rgba(255,255,255,0.1);">
+          <div style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:4px;">{{ target_name }}</div>
+          <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);">{{ target_detail }}</div>
+        </div>
+
+        <!-- Description -->
+        <div class="aa-info-box mb-4"
+          style="{% if action_color == 'danger' %}background:rgba(220,53,69,0.09);border-color:rgba(220,53,69,0.28);{% endif %}">
+          <div class="d-flex align-items-start gap-2">
+            <i class="fas fa-info-circle mt-1"
+              style="flex-shrink:0;color:{% if action_color == 'danger' %}#ff9090{% else %}#FFC53A{% endif %};"></i>
+            <div style="font-size:0.82rem;color:rgba(255,255,255,0.72);">{{ description }}</div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <form method="POST">
+          {% csrf_token %}
+          {% if require_confirm %}<input type="hidden" name="confirm" value="yes">{% endif %}
+
+          <!-- Optional reason textarea -->
+          {% if show_reason %}
+          <div class="mb-4">
+            <label class="aa-label">Reason <span style="font-weight:400;opacity:0.55;">(optional)</span></label>
+            <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);
+              border-radius:12px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;"
+              onfocusin="this.style.borderColor='rgba(255,197,58,0.5)';this.style.boxShadow='0 0 0 3px rgba(255,197,58,0.1)'"
+              onfocusout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.boxShadow=''">
+              <textarea name="reason" rows="3"
+                placeholder="e.g. Student graduated, staff contract ended, pending investigation…"
+                style="width:100%;background:transparent;border:none;outline:none;
+                  padding:12px 14px;color:#fff;font-size:0.85rem;resize:none;
+                  font-family:'Times New Roman',serif;"></textarea>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- New status preview badge -->
+          <div class="d-flex align-items-center gap-2 mb-4 px-3 py-2"
+            style="background:rgba(255,255,255,0.05);border-radius:10px;border:1px solid rgba(255,255,255,0.08);">
+            <span style="font-size:0.72rem;color:rgba(255,255,255,0.4);">Account will become:</span>
+            {% if action == 'Suspend' %}
+            <span class="aa-badge badge-suspended">&#9679; Suspended</span>
+            {% elif action == 'Deactivate' %}
+            <span class="aa-badge badge-deactivated">&#9679; Deactivated</span>
+            {% endif %}
+          </div>
+
+          <!-- Buttons -->
+          <div class="d-flex gap-3">
+            <button type="submit"
+              class="aa-submit flex-fill py-3 {% if action_color == 'warning' %}aa-btn-warn{% else %}aa-btn-danger{% endif %}">
+              <i class="fas {{ icon }} me-2"></i> Confirm {{ action }}
+            </button>
+            <a href="{% url cancel_url %}" class="aa-cancel flex-fill py-3 text-center">
+              <i class="fas fa-times me-2"></i> Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.aa-panel {
+  background:rgba(255,255,255,0.09);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border:1px solid rgba(255,255,255,0.15);border-radius:22px;
+  box-shadow:0 12px 48px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.aa-label {
+  font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.7);
+  margin-bottom:6px;display:block;letter-spacing:0.8px;text-transform:uppercase;
+}
+.aa-info-box {
+  background:rgba(255,197,58,0.09);border:1px solid rgba(255,197,58,0.28);
+  border-radius:12px;padding:14px 16px;
+}
+.aa-badge {
+  padding:3px 12px;border-radius:50px;font-size:0.72rem;font-weight:700;
+}
+.badge-suspended   { background:rgba(255,197,58,0.18);border:1px solid rgba(255,197,58,0.45);color:#FFC53A; }
+.badge-deactivated { background:rgba(220,53,69,0.18);border:1px solid rgba(220,53,69,0.4);color:#ff9090; }
+
+.aa-submit {
+  border:none;border-radius:12px;font-weight:700;font-size:0.9rem;cursor:pointer;
+  transition:all 0.25s;display:inline-flex;align-items:center;justify-content:center;
+}
+.aa-btn-warn {
+  background:linear-gradient(135deg,#e65100,#ef6c00);color:#fff;
+  box-shadow:0 4px 16px rgba(239,108,0,0.4);
+}
+.aa-btn-warn:hover { transform:translateY(-2px);box-shadow:0 8px 26px rgba(239,108,0,0.55); }
+.aa-btn-danger {
+  background:linear-gradient(135deg,#b71c1c,#e53935);color:#fff;
+  box-shadow:0 4px 16px rgba(229,57,53,0.4);
+}
+.aa-btn-danger:hover { transform:translateY(-2px);box-shadow:0 8px 26px rgba(229,57,53,0.55); }
+
+.aa-cancel {
+  background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7)!important;
+  border:1.5px solid rgba(255,255,255,0.18);border-radius:12px;
+  font-weight:600;font-size:0.9rem;transition:all 0.2s;text-decoration:none;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.aa-cancel:hover { background:rgba(255,255,255,0.14);color:#fff!important; }
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp  {from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)}}
+</style>
+{% endblock %}

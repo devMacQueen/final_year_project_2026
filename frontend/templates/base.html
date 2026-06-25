@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PLASU Health Access System{% endblock %}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* ─── PLASU Design System ─── */
+        :root {
+            --plasu-green:       #1E6B45;
+            --plasu-green-mid:   #2B7258;
+            --plasu-green-light: #3d9970;
+            --plasu-green-pale:  #e8f5ee;
+            --plasu-gold:        #FFC53A;
+            --plasu-gold-dark:   #e0a800;
+            --plasu-dark:        #0b1f14;
+            --plasu-dark-mid:    #122a1c;
+            --plasu-dark-card:   rgba(18,42,28,0.85);
+            --plasu-white:       #ffffff;
+            --plasu-glass:       rgba(255,255,255,0.08);
+            --plasu-glass-border:rgba(255,255,255,0.14);
+            --plasu-text-dim:    rgba(255,255,255,0.55);
+            --font-display:      'Playfair Display', Georgia, serif;
+            --font-body:         'DM Sans', sans-serif;
+            --font-mono:         'DM Mono', monospace;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--plasu-dark);
+            color: var(--plasu-white);
+            margin: 0;
+        }
+
+        /* ─── PLASU Sidebar ─── */
+        .plasu-sidebar {
+            background: linear-gradient(180deg,
+                rgba(14,36,24,0.98) 0%,
+                rgba(18,50,34,0.97) 60%,
+                rgba(11,25,17,0.99) 100%);
+            border-right: 1px solid rgba(255,255,255,0.07);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .plasu-nav-section {
+            font-size: 0.6rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: rgba(255,197,58,0.5);
+            font-weight: 700;
+            padding: 4px 12px;
+            margin-bottom: 4px;
+        }
+
+        .plasu-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 14px;
+            border-radius: 10px;
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 2px;
+        }
+
+        .plasu-nav-link i {
+            width: 18px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .plasu-nav-link:hover {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            transform: translateX(3px);
+        }
+
+        .plasu-nav-link.active {
+            background: linear-gradient(135deg, rgba(43,114,88,0.5), rgba(30,107,69,0.4));
+            color: #fff;
+            border: 1px solid rgba(43,114,88,0.4);
+            box-shadow: 0 2px 12px rgba(43,114,88,0.2);
+        }
+
+        .plasu-nav-link.active i { color: var(--plasu-gold); }
+
+        .plasu-nav-logout {
+            color: rgba(255,120,120,0.7) !important;
+        }
+        .plasu-nav-logout:hover {
+            background: rgba(200,50,50,0.15) !important;
+            color: #ff9090 !important;
+        }
+
+        /* ─── Glass Cards ─── */
+        .plasu-glass-card {
+            background: rgba(16,40,26,0.7);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+        }
+
+        .plasu-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            font-size: 0.87rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.85);
+        }
+
+        .plasu-card-body { padding: 20px; }
+
+        /* ─── Stat Cards ─── */
+        .plasu-stat-card {
+            background: rgba(16,40,26,0.7);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 14px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .plasu-stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+        }
+
+        .plasu-stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 14px;
+        }
+
+        .plasu-stat-num {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .plasu-stat-label {
+            font-size: 0.75rem;
+            color: var(--plasu-text-dim);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .plasu-stat-bar {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+        }
+
+        /* ─── Tables ─── */
+        .plasu-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        .plasu-table thead tr {
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .plasu-table th {
+            padding: 10px 14px;
+            font-size: 0.68rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,197,58,0.7);
+            font-weight: 600;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .plasu-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.7);
+            vertical-align: middle;
+        }
+
+        .plasu-table tbody tr:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        /* ─── Badges ─── */
+        .plasu-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .plasu-badge-success { background: rgba(43,114,88,0.3); color: #6edd9e; border: 1px solid rgba(43,114,88,0.5); }
+        .plasu-badge-danger  { background: rgba(220,53,69,0.2);  color: #ff8a8a; border: 1px solid rgba(220,53,69,0.4); }
+        .plasu-badge-warning { background: rgba(255,197,58,0.2); color: #ffd166; border: 1px solid rgba(255,197,58,0.4); }
+
+        .plasu-badge-count {
+            background: rgba(255,197,58,0.15);
+            color: var(--plasu-gold);
+            border: 1px solid rgba(255,197,58,0.3);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        /* ─── Buttons ─── */
+        .plasu-action-btn {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--plasu-green), var(--plasu-green-mid));
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 7px 16px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .plasu-action-btn:hover {
+            background: linear-gradient(135deg, var(--plasu-green-mid), var(--plasu-green-light));
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(43,114,88,0.4);
+        }
+
+        .plasu-action-btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 7px 16px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .plasu-action-btn-ghost:hover {
+            background: rgba(255,255,255,0.07);
+            color: #fff;
+        }
+
+        .plasu-btn-gold {
+            background: linear-gradient(135deg, var(--plasu-gold), var(--plasu-gold-dark));
+            color: #1a1a00;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 32px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .plasu-btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255,197,58,0.4);
+            color: #1a1a00;
+        }
+
+        /* ─── Form Inputs ─── */
+        .plasu-input-group {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .plasu-input-group:focus-within {
+            border-color: rgba(43,114,88,0.6);
+            box-shadow: 0 0 0 3px rgba(43,114,88,0.15);
+        }
+
+        .plasu-input-icon {
+            padding: 0 14px;
+            color: rgba(255,197,58,0.7);
+            font-size: 0.85rem;
+        }
+
+        .plasu-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 11px 14px 11px 0;
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+        }
+
+        .plasu-input::placeholder { color: rgba(255,255,255,0.3); }
+
+        .plasu-select {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 11px 14px 11px 0;
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+        }
+
+        .plasu-select option { background: #1a3a2a; color: #fff; }
+
+        /* ─── Alert ─── */
+        .plasu-alert-warning {
+            background: rgba(255,197,58,0.08);
+            border: 1px solid rgba(255,197,58,0.25);
+            border-left: 3px solid var(--plasu-gold);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.83rem;
+        }
+
+        .plasu-alert-info {
+            background: rgba(30,107,69,0.15);
+            border: 1px solid rgba(43,114,88,0.3);
+            border-left: 3px solid var(--plasu-green-light);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 0.83rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+        ::-webkit-scrollbar-thumb { background: rgba(43,114,88,0.4); border-radius: 3px; }
+
+        /* ─── Toast Notifications ─── */
+        .plasu-toast-wrapper {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 768px) {
+            .plasu-sidebar { width: 100% !important; min-width: unset !important; }
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Toast Notifications -->
+    {% if messages %}
+    <div class="plasu-toast-wrapper">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
+             style="background:rgba(16,40,26,0.95);border:1px solid rgba(255,255,255,0.12);color:#fff;
+                    backdrop-filter:blur(20px);border-radius:12px;min-width:280px;font-size:0.85rem;
+                    {% if message.tags == 'error' or message.tags == 'danger' %}border-left:3px solid #ff6b6b;{% else %}border-left:3px solid var(--plasu-green-light);{% endif %}">
+            {% if message.tags == 'error' or message.tags == 'danger' %}
+            <i class="fas fa-exclamation-circle me-2" style="color:#ff6b6b;"></i>
+            {% else %}
+            <i class="fas fa-check-circle me-2" style="color:var(--plasu-green-light);"></i>
+            {% endif %}
+            {{ message }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" style="font-size:0.7rem;"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

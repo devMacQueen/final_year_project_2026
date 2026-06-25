@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Create Medical Record — PLASU Health Access{% endblock %}
+
+{% block content %}
+<div class="plasu-page-bg">
+  <div class="plasu-overlay"></div><div class="plasu-orb-gold"></div><div class="plasu-orb-green"></div>
+  <div class="plasu-layout">
+
+    <!-- Doctor Sidebar -->
+    <div class="plasu-sidebar" style="width:260px;min-width:260px;">
+      <div class="plasu-brand">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU" class="plasu-brand-logo">
+          <div><div class="plasu-brand-name">PLASU</div><div class="plasu-brand-sub">Health Access System</div></div>
+        </div>
+        <div class="plasu-user-pill">
+          <div class="plasu-user-avatar" style="background:linear-gradient(135deg,#1565c0,#1e88e5);"><i class="fas fa-user-md" style="font-size:0.85rem;"></i></div>
+          <div><div class="plasu-user-name">{{ request.user.username }}</div><div class="plasu-user-role">Doctor</div></div>
+        </div>
+      </div>
+      <nav class="px-3 py-3">
+        <div class="plasu-nav-section">Main Menu</div>
+        <a href="{% url 'doctor_dashboard' %}" class="plasu-nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{% url 'create_medical_record' %}" class="plasu-nav-link active"><i class="fas fa-notes-medical"></i> Create Record</a>
+        <div class="plasu-nav-section mt-3">Account</div>
+        <a href="{% url 'logout_view' %}" class="plasu-nav-link plasu-nav-logout mt-1"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </nav>
+    </div>
+
+    <div class="plasu-main">
+      <div class="plasu-topbar">
+        <div><div class="plasu-topbar-sub">Medical</div><h4 class="plasu-topbar-title">Create Medical Record</h4></div>
+        <a href="{% url 'doctor_dashboard' %}" class="plasu-action-btn-ghost"><i class="fas fa-arrow-left me-2"></i>Back</a>
+      </div>
+
+      <div class="plasu-form-card" style="max-width:760px;">
+
+        <!-- Search patient -->
+        <div class="plasu-form-group" id="searchSection">
+          <label class="plasu-label">
+            <i class="fas fa-search me-1" style="color:rgba(255,197,58,0.6);"></i>
+            Search Patient by Name or Matric Number
+          </label>
+          <div class="plasu-input-group" style="position:relative;">
+            <span class="plasu-input-icon"><i class="fas fa-search"></i></span>
+            <input type="text" id="searchInput" class="plasu-input"
+              placeholder="e.g. John Doe or PLASU/2020/FNAS/0241"
+              autocomplete="off">
+          </div>
+          <div id="searchResults" style="display:none;position:absolute;z-index:1000;width:calc(100% - 60px);
+            background:rgba(14,38,26,0.97);border:1px solid rgba(255,255,255,0.12);
+            border-radius:12px;margin-top:4px;box-shadow:0 10px 30px rgba(0,0,0,0.4);overflow:hidden;"></div>
+        </div>
+
+        <!-- Selected patient display -->
+        <div id="selectedPatient" style="display:none;" class="mb-4">
+          <div style="background:rgba(43,114,88,0.15);border:1px solid rgba(43,114,88,0.3);
+            border-radius:12px;padding:16px;">
+            <div style="font-size:0.72rem;color:var(--plasu-green-light);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">
+              <i class="fas fa-user-check me-1"></i> Selected Patient
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div>
+                <div style="font-size:0.68rem;color:rgba(255,255,255,0.4);margin-bottom:2px;">Full Name</div>
+                <div id="selectedName" style="font-weight:600;color:#fff;font-size:0.9rem;"></div>
+              </div>
+              <div>
+                <div style="font-size:0.68rem;color:rgba(255,255,255,0.4);margin-bottom:2px;">Matric Number</div>
+                <div id="selectedMatric" style="color:#fff;font-family:'DM Mono',monospace;font-size:0.82rem;"></div>
+              </div>
+              <div>
+                <div style="font-size:0.68rem;color:rgba(255,255,255,0.4);margin-bottom:2px;">Faculty</div>
+                <div id="selectedFaculty" style="color:rgba(255,255,255,0.75);font-size:0.82rem;"></div>
+              </div>
+              <div>
+                <div style="font-size:0.68rem;color:rgba(255,255,255,0.4);margin-bottom:2px;">Gender</div>
+                <div id="selectedGender" style="color:rgba(255,255,255,0.75);font-size:0.82rem;"></div>
+              </div>
+            </div>
+            <button type="button" onclick="clearPatient()"
+              style="margin-top:12px;background:transparent;border:1px solid rgba(229,57,53,0.4);
+                     color:rgba(255,100,100,0.8);border-radius:8px;padding:5px 14px;font-size:0.76rem;cursor:pointer;">
+              <i class="fas fa-times me-1"></i> Change Patient
+            </button>
+          </div>
+        </div>
+
+        <!-- Medical record form -->
+        <form method="POST" id="recordForm">
+          {% csrf_token %}
+          <input type="hidden" name="patient" id="patientId">
+
+          <div class="plasu-form-group">
+            <label class="plasu-label">Diagnosis</label>
+            <textarea name="diagnosis" rows="3" required
+              style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+                     border-radius:11px;padding:12px 16px;color:#fff;font-family:'DM Sans',sans-serif;
+                     font-size:0.86rem;resize:vertical;outline:none;transition:border-color 0.2s;"
+              placeholder="Enter patient diagnosis"
+              onfocus="this.style.borderColor='rgba(43,114,88,0.6)'"
+              onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
+          </div>
+
+          <div class="plasu-form-group">
+            <label class="plasu-label">Prescription</label>
+            <textarea name="prescription" rows="3" required
+              style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+                     border-radius:11px;padding:12px 16px;color:#fff;font-family:'DM Sans',sans-serif;
+                     font-size:0.86rem;resize:vertical;outline:none;transition:border-color 0.2s;"
+              placeholder="Enter prescription details"
+              onfocus="this.style.borderColor='rgba(43,114,88,0.6)'"
+              onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
+          </div>
+
+          <div class="plasu-form-group">
+            <label class="plasu-label">Additional Notes <span style="color:rgba(255,255,255,0.3);font-weight:400;">(optional)</span></label>
+            <textarea name="notes" rows="2"
+              style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+                     border-radius:11px;padding:12px 16px;color:#fff;font-family:'DM Sans',sans-serif;
+                     font-size:0.86rem;resize:vertical;outline:none;transition:border-color 0.2s;"
+              placeholder="Optional notes"
+              onfocus="this.style.borderColor='rgba(43,114,88,0.6)'"
+              onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
+          </div>
+
+          <div class="d-flex gap-3 mt-2">
+            <button type="submit" id="submitBtn" disabled class="plasu-action-btn" style="padding:11px 28px;opacity:0.5;transition:opacity 0.2s;">
+              <i class="fas fa-save me-2"></i> Save Record
+            </button>
+            <a href="{% url 'doctor_dashboard' %}" class="plasu-action-btn-ghost" style="padding:11px 20px;">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const patients = [
+    {% for patient in patients %}
+    { id: {{ patient.id }}, name: "{{ patient.full_name }}", matric: "{{ patient.matric_number }}", faculty: "{{ patient.get_faculty_display }}", gender: "{{ patient.gender }}" },
+    {% endfor %}
+];
+
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+const selectedBlock = document.getElementById('selectedPatient');
+const submitBtn = document.getElementById('submitBtn');
+
+searchInput.addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    searchResults.innerHTML = '';
+    if (q.length < 2) { searchResults.style.display = 'none'; return; }
+
+    const filtered = patients.filter(p => p.name.toLowerCase().includes(q) || p.matric.toLowerCase().includes(q));
+
+    if (filtered.length === 0) {
+        searchResults.innerHTML = '<div style="padding:14px 16px;color:rgba(255,255,255,0.4);font-size:0.82rem;">No patient found</div>';
+    } else {
+        filtered.forEach(p => {
+            const item = document.createElement('div');
+            item.style.cssText = 'padding:12px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.15s;';
+            item.onmouseover = () => item.style.background = 'rgba(255,255,255,0.05)';
+            item.onmouseout = () => item.style.background = 'transparent';
+            item.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-weight:600;color:#fff;font-size:0.85rem;">${p.name}</span>
+                    <span style="background:rgba(43,114,88,0.25);color:#6edd9e;border-radius:6px;padding:2px 10px;font-size:0.7rem;font-family:'DM Mono',monospace;">${p.matric}</span>
+                </div>
+                <div style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:2px;">${p.faculty} · ${p.gender}</div>`;
+            item.addEventListener('click', () => selectPatient(p));
+            searchResults.appendChild(item);
+        });
+    }
+    searchResults.style.display = 'block';
+});
+
+function selectPatient(p) {
+    document.getElementById('patientId').value = p.id;
+    document.getElementById('selectedName').textContent = p.name;
+    document.getElementById('selectedMatric').textContent = p.matric;
+    document.getElementById('selectedFaculty').textContent = p.faculty;
+    document.getElementById('selectedGender').textContent = p.gender.charAt(0).toUpperCase() + p.gender.slice(1);
+    selectedBlock.style.display = 'block';
+    document.getElementById('searchSection').style.display = 'none';
+    searchResults.style.display = 'none';
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = '1';
+}
+
+function clearPatient() {
+    document.getElementById('patientId').value = '';
+    selectedBlock.style.display = 'none';
+    document.getElementById('searchSection').style.display = 'block';
+    searchInput.value = '';
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.5';
+}
+
+document.addEventListener('click', e => {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target))
+        searchResults.style.display = 'none';
+});
+</script>
+
+{% include 'partials/plasu_dashboard_styles.html' %}
+{% endblock %}
+

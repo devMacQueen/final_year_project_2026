@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}OTP Verification — PLASU Health Access System{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex flex-column" style="
+  background: url('{% static 'images/clinic_bg.jpg' %}') center center / cover no-repeat;
+  position: relative;">
+
+  <!-- Overlay -->
+  <div style="position:absolute;inset:0;
+    background:linear-gradient(135deg,rgba(26,82,57,0.93) 0%,rgba(43,114,88,0.80) 55%,rgba(20,38,28,0.96) 100%);
+    z-index:0;"></div>
+  <div style="position:absolute;top:-100px;right:-100px;width:420px;height:420px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,197,58,0.14) 0%,transparent 70%);z-index:0;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:-80px;left:-80px;width:340px;height:340px;border-radius:50%;
+    background:radial-gradient(circle,rgba(43,114,88,0.25) 0%,transparent 70%);z-index:0;pointer-events:none;"></div>
+
+  <!-- Navbar -->
+  <div style="position:relative;z-index:2;border-bottom:1px solid rgba(255,255,255,0.1);">
+    <div class="container py-3 d-flex align-items-center gap-3">
+      <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU"
+        style="width:44px;height:44px;object-fit:contain;background:#fff;border-radius:50%;padding:4px;
+               box-shadow:0 2px 12px rgba(255,197,58,0.4);">
+      <div>
+        <div style="font-family:'Georgia',serif;font-size:0.72rem;color:#FFC53A;letter-spacing:2px;text-transform:uppercase;font-weight:700;">Plateau State University</div>
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.6);">Health Access System</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="container d-flex align-items-center justify-content-center flex-grow-1 py-5"
+    style="position:relative;z-index:2;">
+    <div style="width:100%;max-width:460px;">
+
+      <!-- Icon header -->
+      <div class="text-center mb-3" style="animation:fadeDown 0.7s ease both;">
+        <div style="width:86px;height:86px;border-radius:50%;margin:0 auto 14px;
+          background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);
+          border:1.5px solid rgba(255,197,58,0.45);
+          display:flex;align-items:center;justify-content:center;
+          box-shadow:0 0 30px rgba(255,197,58,0.2),0 8px 24px rgba(0,0,0,0.25);">
+          <i class="fas fa-shield-alt" style="font-size:2rem;color:#FFC53A;"></i>
+        </div>
+        <h5 style="font-family:'Georgia',serif;font-weight:700;color:#fff;margin-bottom:4px;">
+          Two-Factor Verification
+        </h5>
+        <p style="font-size:0.82rem;color:rgba(255,255,255,0.6);margin:0;">{{ purpose }}</p>
+      </div>
+
+      <!-- Glass panel -->
+      <div class="plasu-glass-panel p-4" style="animation:fadeUp 0.8s 0.1s ease both;">
+
+        <!-- Alert messages -->
+        {% if error %}
+        <div class="otp-alert otp-alert-error mb-3">
+          <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+        </div>
+        {% endif %}
+        {% if warning %}
+        <div class="otp-alert otp-alert-warning mb-3">
+          <i class="fas fa-clock me-2"></i>{{ warning }}
+        </div>
+        {% endif %}
+        {% if info %}
+        <div class="otp-alert otp-alert-success mb-3">
+          <i class="fas fa-check-circle me-2"></i>{{ info }}
+        </div>
+        {% endif %}
+        {% for message in messages %}
+        <div class="otp-alert otp-alert-error mb-3">
+          <i class="fas fa-info-circle me-2"></i>{{ message }}
+        </div>
+        {% endfor %}
+
+        <!-- Phone info -->
+        <div class="otp-info-box mb-3">
+          <div class="d-flex align-items-start gap-2">
+            <i class="fas fa-mobile-alt mt-1" style="color:#FFC53A;flex-shrink:0;"></i>
+            <div style="font-size:0.82rem;color:rgba(255,255,255,0.75);">
+              A 6-digit code was sent to
+              <strong style="color:#FFC53A;">{{ phone }}</strong>.
+              Enter it below before it expires.
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Countdown Timer ─────────────────────────────────── -->
+        <div class="text-center mb-3">
+          <div id="timer-ring-wrap" style="position:relative;width:90px;height:90px;margin:0 auto 8px;">
+            <svg width="90" height="90" style="transform:rotate(-90deg);">
+              <circle cx="45" cy="45" r="38"
+                fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6"/>
+              <circle id="timer-arc" cx="45" cy="45" r="38"
+                fill="none" stroke="#FFC53A" stroke-width="6"
+                stroke-dasharray="238.76" stroke-dashoffset="0"
+                stroke-linecap="round"
+                style="transition:stroke-dashoffset 1s linear, stroke 0.5s;"/>
+            </svg>
+            <div id="timer-display" style="
+              position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+              font-family:'Georgia',serif;font-size:1.25rem;font-weight:700;
+              color:#FFC53A;line-height:1;text-align:center;">
+              5:00
+            </div>
+          </div>
+          <div id="timer-label" style="font-size:0.72rem;color:rgba(255,255,255,0.45);
+            letter-spacing:1px;text-transform:uppercase;">Code expires in</div>
+          <!-- Expired message (hidden until timer hits 0) -->
+          <div id="expired-msg" style="display:none;" class="otp-alert otp-alert-error mt-2">
+            <i class="fas fa-times-circle me-2"></i>
+            Your code has expired.
+            <a href="{% url 'resend_otp' %}" style="color:#ff9090;font-weight:700;">Get a new code</a>
+          </div>
+        </div>
+
+        <!-- ── Simulation OTP display ────────────────────────────── -->
+        {% if otp_code %}
+        <div class="otp-info-box mb-3" style="background:rgba(43,114,88,0.18);border-color:rgba(43,114,88,0.4);">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-flask" style="color:#6ee7b7;flex-shrink:0;font-size:0.9rem;"></i>
+            <div>
+              <div style="font-size:0.68rem;color:#6ee7b7;font-weight:700;text-transform:uppercase;
+                letter-spacing:1px;margin-bottom:2px;">Simulation Mode</div>
+              <div style="font-size:0.72rem;color:rgba(255,255,255,0.6);">
+                In production this arrives via SMS. Your code:
+              </div>
+              <div style="font-size:1.6rem;font-weight:900;color:#fff;letter-spacing:10px;
+                font-family:'Georgia',serif;margin-top:4px;">{{ otp_code }}</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- ── OTP Input Form ─────────────────────────────────────── -->
+        <form method="POST" action="{% url 'verify_otp' %}" id="otp-form">
+          {% csrf_token %}
+          <div class="mb-4">
+            <label class="plasu-label">Enter Verification Code</label>
+
+            <!-- 6 individual digit boxes -->
+            <div class="d-flex gap-2 justify-content-center mb-2" id="digit-boxes">
+              <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" tabindex="1">
+              <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" tabindex="2">
+              <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" tabindex="3">
+              <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" tabindex="4">
+              <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" tabindex="5">
+              <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" tabindex="6">
+            </div>
+            <!-- Hidden field that JS fills before submit -->
+            <input type="hidden" name="otp_code" id="otp-hidden">
+          </div>
+
+          <button type="submit" id="verify-btn" class="plasu-submit-btn w-100 py-3 mb-3" disabled>
+            <i class="fas fa-check-circle me-2"></i> Verify & Login
+          </button>
+        </form>
+
+        <!-- ── Resend OTP ─────────────────────────────────────────── -->
+        <div class="text-center">
+          <span style="font-size:0.78rem;color:rgba(255,255,255,0.4);">Didn't receive the code?</span>
+          <br>
+
+          <!-- Resend button (disabled with countdown if cooldown active) -->
+          {% if resend_wait %}
+          <span id="resend-wrap">
+            <a href="#" id="resend-btn" class="resend-link disabled-link"
+              style="pointer-events:none;opacity:0.4;">
+              Resend OTP (<span id="resend-countdown">{{ resend_wait }}</span>s)
+            </a>
+          </span>
+          {% else %}
+          <span id="resend-wrap">
+            <a href="{% url 'resend_otp' %}" id="resend-btn" class="resend-link">
+              <i class="fas fa-redo me-1"></i> Resend OTP
+            </a>
+          </span>
+          {% endif %}
+        </div>
+
+        <!-- Divider -->
+        <div class="d-flex align-items-center gap-2 mt-4">
+          <div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>
+          <span style="font-size:0.65rem;color:rgba(255,255,255,0.3);">OR</span>
+          <div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>
+        </div>
+        <a href="{% url 'login_page' %}" class="plasu-back-link w-100 d-block text-center py-2 mt-3">
+          <i class="fas fa-arrow-left me-2"></i> Back to Login
+        </a>
+      </div>
+
+      <p class="text-center mt-3" style="font-size:0.68rem;color:rgba(255,255,255,0.3);">
+        <i class="fas fa-lock me-1"></i>
+        Valid for 5 minutes · Single use · Do not share this code
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Styles ─────────────────────────────────────────────────── -->
+<style>
+.plasu-glass-panel {
+  background:rgba(255,255,255,0.09);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border:1px solid rgba(255,255,255,0.18);border-radius:22px;
+  box-shadow:0 12px 48px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.13);
+}
+.plasu-label {
+  font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.7);
+  margin-bottom:10px;display:block;letter-spacing:1px;text-transform:uppercase;
+  text-align:center;
+}
+/* OTP digit boxes */
+.otp-digit {
+  width:44px;height:54px;border-radius:12px;
+  background:rgba(255,255,255,0.08);
+  border:1.5px solid rgba(255,255,255,0.2);
+  color:#fff;font-size:1.4rem;font-weight:700;
+  text-align:center;outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
+  font-family:'Georgia',serif;
+}
+.otp-digit:focus {
+  border-color:#FFC53A;
+  box-shadow:0 0 0 3px rgba(255,197,58,0.18);
+  background:rgba(255,197,58,0.08);
+}
+.otp-digit.filled {
+  border-color:rgba(43,114,88,0.7);
+  background:rgba(43,114,88,0.15);
+}
+/* Buttons */
+.plasu-submit-btn {
+  background:linear-gradient(135deg,#FFC53A,#e0a800);
+  color:#1a3a2a;border:none;border-radius:12px;
+  font-weight:700;font-size:1rem;cursor:pointer;
+  transition:all 0.25s;box-shadow:0 4px 20px rgba(255,197,58,0.4);
+}
+.plasu-submit-btn:not(:disabled):hover {
+  transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,197,58,0.55);
+}
+.plasu-submit-btn:disabled {
+  opacity:0.45;cursor:not-allowed;
+}
+.plasu-back-link {
+  border:1.5px solid rgba(255,255,255,0.18);border-radius:12px;
+  color:rgba(255,255,255,0.65)!important;text-decoration:none;
+  font-size:0.84rem;font-weight:600;transition:all 0.2s;
+}
+.plasu-back-link:hover {
+  background:rgba(255,255,255,0.08);color:#fff!important;
+  border-color:rgba(255,197,58,0.4);
+}
+.resend-link {
+  font-size:0.82rem;color:#FFC53A;font-weight:700;
+  text-decoration:none;transition:opacity 0.2s;
+}
+.resend-link:hover { opacity:0.75;color:#FFC53A; }
+/* Alert boxes */
+.otp-info-box {
+  background:rgba(255,197,58,0.09);border:1px solid rgba(255,197,58,0.28);
+  border-radius:12px;padding:14px 16px;
+}
+.otp-alert {
+  border-radius:10px;padding:10px 14px;font-size:0.82rem;
+}
+.otp-alert-error {
+  background:rgba(220,53,69,0.14);border:1px solid rgba(220,53,69,0.3);color:#ff9090;
+}
+.otp-alert-warning {
+  background:rgba(255,197,58,0.12);border:1px solid rgba(255,197,58,0.35);color:#FFC53A;
+}
+.otp-alert-success {
+  background:rgba(43,114,88,0.18);border:1px solid rgba(43,114,88,0.38);color:#6ee7b7;
+}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp  {from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)}}
+</style>
+
+<!-- ── JavaScript ─────────────────────────────────────────────── -->
+<script>
+// ── OTP digit-box logic ───────────────────────────────────────────
+const digits     = Array.from(document.querySelectorAll('.otp-digit'));
+const hiddenInput= document.getElementById('otp-hidden');
+const verifyBtn  = document.getElementById('verify-btn');
+
+digits.forEach((box, i) => {
+  box.addEventListener('input', e => {
+    // Only allow digits
+    box.value = box.value.replace(/\D/g, '').slice(-1);
+    if (box.value) {
+      box.classList.add('filled');
+      if (i < digits.length - 1) digits[i + 1].focus();
+    } else {
+      box.classList.remove('filled');
+    }
+    syncHidden();
+  });
+
+  box.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && !box.value && i > 0) {
+      digits[i - 1].focus();
+      digits[i - 1].value = '';
+      digits[i - 1].classList.remove('filled');
+      syncHidden();
+    }
+    // Allow paste via Ctrl+V on first box
+    if ((e.ctrlKey || e.metaKey) && e.key === 'v') return;
+  });
+
+  // Handle paste on any box
+  box.addEventListener('paste', e => {
+    e.preventDefault();
+    const pasted = (e.clipboardData || window.clipboardData)
+      .getData('text').replace(/\D/g, '').slice(0, 6);
+    pasted.split('').forEach((ch, j) => {
+      if (digits[j]) {
+        digits[j].value = ch;
+        digits[j].classList.add('filled');
+      }
+    });
+    const next = Math.min(pasted.length, digits.length - 1);
+    digits[next].focus();
+    syncHidden();
+  });
+});
+
+function syncHidden() {
+  const code = digits.map(d => d.value).join('');
+  hiddenInput.value = code;
+  verifyBtn.disabled = code.length !== 6;
+}
+
+// Focus first box on load
+document.addEventListener('DOMContentLoaded', () => {
+  if (digits[0]) digits[0].focus();
+});
+
+// ── OTP 5-minute countdown timer ─────────────────────────────────
+(function() {
+  const TOTAL_SECS = {{ seconds_remaining|default:300 }};
+  const FULL_DASH  = 238.76;   // 2πr where r=38
+  const arc        = document.getElementById('timer-arc');
+  const display    = document.getElementById('timer-display');
+  const label      = document.getElementById('timer-label');
+  const expiredMsg = document.getElementById('expired-msg');
+  const form       = document.getElementById('otp-form');
+
+  let remaining = TOTAL_SECS;
+
+  function update() {
+    if (remaining < 0) remaining = 0;
+
+    const mins = Math.floor(remaining / 60);
+    const secs = remaining % 60;
+    display.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+
+    // Arc progress (shrinks as time runs out)
+    const fraction  = remaining / 300;   // 300 = 5 min total
+    const offset    = FULL_DASH * (1 - fraction);
+    arc.style.strokeDashoffset = offset;
+
+    // Colour shift: gold → orange → red
+    if (remaining > 120) {
+      arc.style.stroke   = '#FFC53A';
+      display.style.color= '#FFC53A';
+    } else if (remaining > 30) {
+      arc.style.stroke   = '#ef6c00';
+      display.style.color= '#ef6c00';
+    } else {
+      arc.style.stroke   = '#e53935';
+      display.style.color= '#e53935';
+    }
+
+    if (remaining <= 0) {
+      label.textContent = 'Code expired';
+      display.textContent = '0:00';
+      expiredMsg.style.display = 'block';
+      verifyBtn.disabled = true;
+      verifyBtn.textContent = 'Code Expired';
+      // Disable digit boxes
+      digits.forEach(d => { d.disabled = true; d.style.opacity = '0.4'; });
+      return; // stop ticking
+    }
+
+    remaining--;
+    setTimeout(update, 1000);
+  }
+
+  update();
+})();
+
+// ── Resend countdown (60-sec cooldown) ───────────────────────────
+(function() {
+  const countdownEl = document.getElementById('resend-countdown');
+  const resendBtn   = document.getElementById('resend-btn');
+  if (!countdownEl) return;   // no cooldown active
+
+  let wait = parseInt(countdownEl.textContent, 10);
+
+  const tick = setInterval(() => {
+    wait--;
+    if (wait <= 0) {
+      clearInterval(tick);
+      resendBtn.href = "{% url 'resend_otp' %}";
+      resendBtn.style.pointerEvents = '';
+      resendBtn.style.opacity = '';
+      resendBtn.innerHTML = '<i class="fas fa-redo me-1"></i> Resend OTP';
+    } else {
+      countdownEl.textContent = wait;
+    }
+  }, 1000);
+})();
+</script>
+{% endblock %}

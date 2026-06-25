@@ -1,0 +1,59 @@
+<style>
+.plasu-page-bg {
+    min-height: 100vh;
+    background: linear-gradient(145deg, rgba(11,25,17,0.96) 0%, rgba(18,50,34,0.90) 45%, rgba(9,22,15,0.97) 100%);
+    position: relative;
+}
+.plasu-overlay {
+    position: fixed; inset: 0;
+    background: linear-gradient(145deg, rgba(11,25,17,0.96) 0%, rgba(18,50,34,0.90) 45%, rgba(9,22,15,0.97) 100%);
+    z-index: 0; pointer-events: none;
+}
+.plasu-orb-gold {
+    position: fixed; top: -140px; right: -140px;
+    width: 520px; height: 520px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,197,58,0.08) 0%, transparent 65%);
+    z-index: 0; pointer-events: none;
+}
+.plasu-orb-green {
+    position: fixed; bottom: -100px; left: 180px;
+    width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(43,114,88,0.14) 0%, transparent 65%);
+    z-index: 0; pointer-events: none;
+}
+.plasu-layout { position: relative; z-index: 1; display: flex; min-height: 100vh; }
+.plasu-main { flex: 1; padding: 28px; min-width: 0; overflow-y: auto; }
+.plasu-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+.plasu-topbar-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.5rem; color: #fff; margin: 0; }
+.plasu-topbar-sub { font-size: 0.7rem; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 3px; }
+.plasu-topbar-date { font-size: 0.76rem; color: rgba(255,255,255,0.4); }
+.plasu-brand { padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.plasu-brand-logo { width: 44px; height: 44px; object-fit: contain; background: #fff; border-radius: 50%; padding: 4px; box-shadow: 0 2px 14px rgba(255,197,58,0.35); flex-shrink: 0; }
+.plasu-brand-name { font-size: 0.68rem; color: var(--plasu-gold); letter-spacing: 2px; text-transform: uppercase; font-weight: 700; font-family: 'Playfair Display', serif; }
+.plasu-brand-sub { font-size: 0.58rem; color: rgba(255,255,255,0.45); }
+.plasu-user-pill { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 12px; margin-top: 12px; }
+.plasu-user-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem; color: #fff; }
+.plasu-user-name { font-size: 0.75rem; font-weight: 700; color: #fff; }
+.plasu-user-role { font-size: 0.62rem; color: var(--plasu-gold); }
+.plasu-form-card { background: rgba(16,40,26,0.75); border: 1px solid rgba(255,255,255,0.09); border-radius: 16px; padding: 28px; backdrop-filter: blur(20px); max-width: 720px; }
+.plasu-label { font-size: 0.78rem; font-weight: 600; color: rgba(255,255,255,0.7); letter-spacing: 0.3px; margin-bottom: 6px; display: block; }
+.plasu-form-group { margin-bottom: 18px; }
+
+
+.badge-active {
+  background: rgba(43,114,88,0.25);
+  border: 1px solid rgba(43,114,88,0.5);
+  color: #6ee7b7;
+}
+.badge-suspended {
+  background: rgba(255,197,58,0.18);
+  border: 1px solid rgba(255,197,58,0.45);
+  color: #FFC53A;
+}
+.badge-deactivated {
+  background: rgba(220,53,69,0.18);
+  border: 1px solid rgba(220,53,69,0.4);
+  color: #ff9090;
+}
+
+</style>

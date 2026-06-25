@@ -1,0 +1,412 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Welcome — PLASU Health Access System{% endblock %}
+
+{% block extra_head %}
+<style>
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(160deg, rgba(11,25,17,0.45) 0%, rgba(22,65,44,0.40) 50%, rgba(8,20,13,0.50) 100%),
+        url("{% static 'images/clinic-bg.jpg' %}") center / cover no-repeat;
+}
+
+/* Animated orbs */
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: float 8s ease-in-out infinite;
+}
+.orb-1 {
+    width: 600px; height: 600px;
+    top: -200px; right: -150px;
+    background: radial-gradient(circle, rgba(255,197,58,0.09) 0%, transparent 65%);
+    animation-delay: 0s;
+}
+.orb-2 {
+    width: 400px; height: 400px;
+    bottom: -100px; left: -80px;
+    background: radial-gradient(circle, rgba(43,114,88,0.18) 0%, transparent 65%);
+    animation-delay: -4s;
+}
+.orb-3 {
+    width: 250px; height: 250px;
+    top: 30%; left: 15%;
+    background: radial-gradient(circle, rgba(255,197,58,0.05) 0%, transparent 65%);
+    animation-delay: -2s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50%       { transform: translateY(-30px) scale(1.04); }
+}
+
+/* Particle dots */
+.particle {
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: rgba(255,197,58,0.4);
+    animation: drift 12s linear infinite;
+}
+
+@keyframes drift {
+    0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: translateY(-100px) translateX(40px); opacity: 0; }
+}
+
+/* Decorative grid lines */
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+}
+
+/* Hero content */
+.hero-content {
+    position: relative;
+    z-index: 2;
+    animation: fadeUp 0.9s ease both;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Logo */
+.hero-logo {
+    width: 88px; height: 88px;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 50%;
+    padding: 8px;
+    box-shadow: 0 0 0 4px rgba(255,197,58,0.2), 0 10px 40px rgba(0,0,0,0.4);
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(255,197,58,0.2), 0 10px 40px rgba(0,0,0,0.4); }
+    50%       { box-shadow: 0 0 0 8px rgba(255,197,58,0.15), 0 10px 40px rgba(0,0,0,0.4); }
+}
+
+/* Eyebrow */
+.hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,197,58,0.1);
+    border: 1px solid rgba(255,197,58,0.25);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--plasu-gold);
+    margin-bottom: 20px;
+}
+
+/* Main heading */
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 16px;
+}
+
+.hero-title span {
+    background: linear-gradient(135deg, #FFC53A, #fff 60%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 36px;
+}
+
+/* Glass CTA box */
+.hero-cta-box {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 28px 32px;
+    display: inline-block;
+    animation: fadeUp 0.9s 0.3s ease both;
+}
+
+/* Stats strip */
+.hero-stats {
+    display: flex;
+    gap: 32px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.9s 0.5s ease both;
+}
+
+.hero-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.hero-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--plasu-gold);
+}
+
+.hero-stat-label {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Right column card */
+.hero-info-card {
+    background: rgba(14,38,26,0.75);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 28px;
+    backdrop-filter: blur(20px);
+    animation: fadeUp 0.9s 0.2s ease both;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.feature-item:last-child { border-bottom: none; }
+
+.feature-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.95rem;
+}
+
+.feature-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.feature-desc {
+    font-size: 0.76rem;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.5;
+}
+
+/* Top nav */
+.hero-nav {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(11,25,17,0.5);
+    backdrop-filter: blur(12px);
+}
+
+.divider-v {
+    width: 1px;
+    height: 40px;
+    background: rgba(255,255,255,0.12);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Top Nav -->
+<nav class="hero-nav">
+    <div class="d-flex align-items-center gap-3">
+        <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU"
+             style="width:36px;height:36px;object-fit:contain;background:#fff;border-radius:50%;padding:3px;">
+        <div>
+            <div style="font-size:0.65rem;color:var(--plasu-gold);letter-spacing:2px;text-transform:uppercase;font-weight:700;font-family:'Playfair Display',serif;">PLASU</div>
+            <div style="font-size:0.58rem;color:rgba(255,255,255,0.45);">Health Access System</div>
+        </div>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <span style="font-size:0.78rem;color:rgba(255,255,255,0.5);">
+            <i class="fas fa-map-marker-alt me-1" style="color:var(--plasu-gold);"></i>
+            Bokkos, Plateau State
+        </span>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<div class="hero">
+    <!-- Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Particles -->
+    <div class="particle" style="left:10%;animation-duration:15s;animation-delay:0s;"></div>
+    <div class="particle" style="left:25%;animation-duration:18s;animation-delay:-5s;"></div>
+    <div class="particle" style="left:50%;animation-duration:12s;animation-delay:-8s;"></div>
+    <div class="particle" style="left:75%;animation-duration:20s;animation-delay:-3s;"></div>
+    <div class="particle" style="left:88%;animation-duration:14s;animation-delay:-11s;"></div>
+
+    <div class="container" style="padding-top:80px;">
+        <div class="row align-items-center g-5">
+
+            <!-- Left: Hero text -->
+            <div class="col-lg-6">
+                <div class="hero-content">
+
+                    <div class="hero-eyebrow">
+                        <i class="fas fa-shield-heart"></i>
+                        Student Health Services
+                    </div>
+
+                    <h1 class="hero-title">
+                        Your Health,<br>
+                        <span>Our Priority</span>
+                    </h1>
+
+                    <p class="hero-subtitle">
+                        Plateau State University's unified digital health platform — connecting students,
+                        doctors, and administration for seamless, secure medical care.
+                    </p>
+
+                    <!-- CTA Box -->
+                    <div class="hero-cta-box">
+                        <p style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;">
+                            Get Started
+                        </p>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <a href="{% url 'login_page' %}" class="plasu-btn-gold">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                            <a href="{% url 'register_patient' %}"
+                               style="display:inline-flex;align-items:center;gap:8px;
+                                      background:transparent;border:1px solid rgba(255,255,255,0.2);
+                                      color:rgba(255,255,255,0.8);border-radius:10px;padding:12px 24px;
+                                      font-size:0.9rem;font-weight:500;text-decoration:none;transition:all 0.2s;"
+                               onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+                               onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fas fa-user-plus"></i> Register
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <span class="hero-stat-num">3</span>
+                            <span class="hero-stat-label">Access Methods</span>
+                        </div>
+                        <div class="divider-v"></div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-num">24/7</span>
+                            <span class="hero-stat-label">System Access</span>
+                        </div>
+                        <div class="divider-v"></div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-num">100%</span>
+                            <span class="hero-stat-label">Secure & Digital</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right: Feature card -->
+            <div class="col-lg-6">
+                <div class="hero-info-card">
+
+                    <div class="text-center mb-4">
+                        <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU" class="hero-logo">
+                        <div style="margin-top:14px;font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#fff;">
+                            Plateau State University
+                        </div>
+                        <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);">Medical & Health Services Centre</div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background:linear-gradient(135deg,#2B7258,#3d9970);">
+                            <i class="fas fa-id-card" style="color:#fff;"></i>
+                        </div>
+                        <div>
+                            <div class="feature-title">Virtual Health Card</div>
+                            <div class="feature-desc">Access your personal digital health card with smartcard ID and biometric status anytime.</div>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background:linear-gradient(135deg,#1565c0,#1e88e5);">
+                            <i class="fas fa-calendar-check" style="color:#fff;"></i>
+                        </div>
+                        <div>
+                            <div class="feature-title">Online Appointments</div>
+                            <div class="feature-desc">Book, track, and manage clinic appointments with assigned doctors from your dashboard.</div>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background:linear-gradient(135deg,#7b1fa2,#ab47bc);">
+                            <i class="fas fa-fingerprint" style="color:#fff;"></i>
+                        </div>
+                        <div>
+                            <div class="feature-title">Multi-Factor Login</div>
+                            <div class="feature-desc">Secure access via password, smartcard ID, or biometric PIN — your choice.</div>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background:linear-gradient(135deg,#e65100,#ef6c00);">
+                            <i class="fas fa-notes-medical" style="color:#fff;"></i>
+                        </div>
+                        <div>
+                            <div class="feature-title">Medical Records</div>
+                            <div class="feature-desc">View your complete health history, diagnoses, and prescriptions from the clinic.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bottom wave decoration -->
+    <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,197,58,0.3),transparent);"></div>
+</div>
+
+{% endblock %}

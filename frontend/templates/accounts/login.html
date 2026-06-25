@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Login — PLASU Health Access System{% endblock %}
+
+{% block extra_head %}
+<style>
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    background:
+        linear-gradient(155deg, rgba(11,25,17,0.55) 0%, rgba(20,58,38,0.50) 50%, rgba(8,18,12,0.60) 100%),
+        url("{% static 'images/clinic-bg.jpg' %}") center / cover no-repeat;
+}
+
+.login-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+    background-size: 55px 55px;
+    pointer-events: none;
+}
+
+.login-orb-1 {
+    position: absolute;
+    top: -160px; right: -160px;
+    width: 550px; height: 550px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,197,58,0.08) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.login-orb-2 {
+    position: absolute;
+    bottom: -100px; left: -80px;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(43,114,88,0.15) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+/* Split layout */
+.login-left {
+    padding: 60px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.login-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    padding: 40px 20px;
+}
+
+/* Glass card */
+.login-card {
+    background: rgba(14,38,26,0.75);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 36px 32px;
+    backdrop-filter: blur(24px);
+    width: 100%;
+    max-width: 420px;
+    animation: slideIn 0.7s ease both;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Tab buttons */
+.login-tabs {
+    display: flex;
+    gap: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 5px;
+    margin-bottom: 28px;
+}
+
+.login-tab {
+    flex: 1;
+    padding: 9px 8px;
+    border: none;
+    border-radius: 9px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: 'DM Sans', sans-serif;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.login-tab.active {
+    background: linear-gradient(135deg, var(--plasu-green), var(--plasu-green-mid));
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(43,114,88,0.4);
+}
+
+.login-tab:not(.active):hover {
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.8);
+}
+
+/* Input group */
+.login-input-group {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-input-group:focus-within {
+    border-color: rgba(43,114,88,0.7);
+    box-shadow: 0 0 0 3px rgba(43,114,88,0.15);
+}
+
+.login-input-icon {
+    padding: 0 14px;
+    color: rgba(255,197,58,0.65);
+    font-size: 0.85rem;
+}
+
+.login-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 13px 14px 13px 0;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+}
+
+.login-input::placeholder { color: rgba(255,255,255,0.28); }
+
+/* Submit button */
+.login-btn {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--plasu-gold), var(--plasu-gold-dark));
+    color: #1a1200;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 6px;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255,197,58,0.35);
+}
+
+/* Info pills on left */
+.info-pill {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+}
+
+.info-pill-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
+    color: #fff;
+}
+
+@media (max-width: 991px) {
+    .login-left { display: none; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-page">
+    <div class="login-orb-1"></div>
+    <div class="login-orb-2"></div>
+
+    <div class="container-fluid">
+        <div class="row" style="min-height:100vh;">
+
+            <!-- Left panel: branding -->
+            <div class="col-lg-6 login-left">
+                <div style="max-width:480px;">
+
+                    <!-- Logo + name -->
+                    <div class="d-flex align-items-center gap-3 mb-5">
+                        <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU"
+                             style="width:52px;height:52px;object-fit:contain;background:#fff;border-radius:50%;padding:5px;
+                                    box-shadow:0 4px 20px rgba(255,197,58,0.3);">
+                        <div>
+                            <div style="font-size:0.7rem;color:var(--plasu-gold);letter-spacing:2.5px;text-transform:uppercase;font-weight:700;font-family:'Playfair Display',serif;">PLASU</div>
+                            <div style="font-size:0.62rem;color:rgba(255,255,255,0.45);">Health Access System</div>
+                        </div>
+                    </div>
+
+                    <div style="font-size:0.72rem;color:rgba(255,197,58,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Welcome Back</div>
+                    <h1 style="font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:800;color:#fff;line-height:1.2;margin-bottom:16px;">
+                        Access Your<br>Health Portal
+                    </h1>
+                    <p style="font-size:0.92rem;color:rgba(255,255,255,0.5);line-height:1.8;margin-bottom:40px;">
+                        Sign in to manage appointments, view your medical records,
+                        and access your virtual health card — all in one place.
+                    </p>
+
+                    <div class="info-pill">
+                        <div class="info-pill-icon" style="background:linear-gradient(135deg,#2B7258,#3d9970);">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:0.82rem;font-weight:600;color:#fff;">Secure Login</div>
+                            <div style="font-size:0.73rem;color:rgba(255,255,255,0.45);">Password, Smartcard or Biometric PIN</div>
+                        </div>
+                    </div>
+
+                    <div class="info-pill">
+                        <div class="info-pill-icon" style="background:linear-gradient(135deg,#1565c0,#1e88e5);">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:0.82rem;font-weight:600;color:#fff;">Manage Appointments</div>
+                            <div style="font-size:0.73rem;color:rgba(255,255,255,0.45);">Book and track clinic visits</div>
+                        </div>
+                    </div>
+
+                    <div class="info-pill">
+                        <div class="info-pill-icon" style="background:linear-gradient(135deg,#e65100,#ef6c00);">
+                            <i class="fas fa-notes-medical"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:0.82rem;font-weight:600;color:#fff;">Medical History</div>
+                            <div style="font-size:0.73rem;color:rgba(255,255,255,0.45);">View diagnoses and prescriptions</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right panel: login form -->
+            <div class="col-lg-6 login-right">
+                <div class="login-card">
+
+                    <!-- Header -->
+                    <div class="text-center mb-5">
+                        <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU"
+                             style="width:60px;height:60px;object-fit:contain;background:#fff;border-radius:50%;padding:6px;
+                                    box-shadow:0 4px 20px rgba(255,197,58,0.3);margin-bottom:14px;">
+                        <div style="font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:#fff;margin-bottom:4px;">PLASU Health Access</div>
+                        <div style="font-size:0.76rem;color:rgba(255,255,255,0.45);">Choose your login method below</div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="login-tabs">
+                        <button class="login-tab active" id="tab-btn-password" onclick="switchTab('password')">
+                            <i class="fas fa-lock"></i> Password
+                        </button>
+                        <button class="login-tab" id="tab-btn-smartcard" onclick="switchTab('smartcard')">
+                            <i class="fas fa-id-card"></i> Smartcard
+                        </button>
+                        <button class="login-tab" id="tab-btn-biometric" onclick="switchTab('biometric')">
+                            <i class="fas fa-fingerprint"></i> Biometric
+                        </button>
+                    </div>
+
+                    <!-- PASSWORD TAB -->
+                    <div id="tab-password">
+                        <form method="POST" action="{% url 'login_password' %}">
+                            {% csrf_token %}
+                            <div class="login-input-group">
+                                <span class="login-input-icon"><i class="fas fa-user"></i></span>
+                                <input type="text" name="username" class="login-input" placeholder="Username" required>
+                            </div>
+                            <div class="login-input-group">
+                                <span class="login-input-icon"><i class="fas fa-lock"></i></span>
+                                <input type="password" name="password" class="login-input" placeholder="Password" required>
+                            </div>
+                            <button type="submit" class="login-btn">
+                                <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- forgot password-->
+
+                <div class="text-end mb-3">
+                    <a href="{% url 'forgot_password' %}"
+                        style="font-size:0.78rem;color:rgba(255,255,255,0.5);text-decoration:none;">
+                        Forgot password?
+                    </a>
+                </div>
+
+                    <!-- SMARTCARD TAB -->
+                    <div id="tab-smartcard" style="display:none;">
+                        <form method="POST" action="{% url 'login_smartcard' %}">
+                            {% csrf_token %}
+                            <div style="text-align:center;margin-bottom:20px;">
+                                <div style="display:inline-flex;width:64px;height:64px;border-radius:50%;
+                                    background:linear-gradient(135deg,#1565c0,#1e88e5);
+                                    align-items:center;justify-content:center;
+                                    box-shadow:0 4px 20px rgba(30,136,229,0.3);">
+                                    <i class="fas fa-id-card" style="font-size:1.6rem;color:#fff;"></i>
+                                </div>
+                                <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-top:10px;">Enter your assigned smartcard ID</div>
+                            </div>
+                            <div class="login-input-group">
+                                <span class="login-input-icon"><i class="fas fa-id-card"></i></span>
+                                <input type="text" name="smartcard_id" class="login-input" placeholder="Smartcard ID (e.g. SC-2024-0001)" required style="font-family:'DM Mono',monospace;letter-spacing:1px;">
+                            </div>
+                            <button type="submit" class="login-btn">
+                                <i class="fas fa-id-card me-2"></i> Login with Smartcard
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- BIOMETRIC TAB -->
+                    <div id="tab-biometric" style="display:none;">
+                        <form method="POST" action="{% url 'login_biometric' %}">
+                            {% csrf_token %}
+                            <div style="text-align:center;margin-bottom:20px;">
+                                <div style="display:inline-flex;width:64px;height:64px;border-radius:50%;
+                                    background:linear-gradient(135deg,#7b1fa2,#ab47bc);
+                                    align-items:center;justify-content:center;
+                                    box-shadow:0 4px 20px rgba(171,71,188,0.3);">
+                                    <i class="fas fa-fingerprint" style="font-size:1.6rem;color:#fff;"></i>
+                                </div>
+                                <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-top:10px;">Enter your 6-digit biometric PIN</div>
+                            </div>
+                            <div class="login-input-group">
+                                <span class="login-input-icon"><i class="fas fa-fingerprint"></i></span>
+                                <input type="password" name="biometric_pin" class="login-input"
+                                    placeholder="• • • • • •" maxlength="6"
+                                    style="font-family:'DM Mono',monospace;letter-spacing:8px;font-size:1rem;" required>
+                            </div>
+                            <button type="submit" class="login-btn">
+                                <i class="fas fa-fingerprint me-2"></i> Login with Biometric
+                            </button>
+                        </form>
+                    </div>
+
+                    <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07);text-align:center;font-size:0.8rem;color:rgba(255,255,255,0.4);">
+                        Don't have an account?
+                        <a href="{% url 'register_patient' %}" style="color:var(--plasu-gold);font-weight:600;text-decoration:none;">Register here</a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+function switchTab(tab) {
+    ['password', 'smartcard', 'biometric'].forEach(t => {
+        document.getElementById('tab-' + t).style.display = 'none';
+        document.getElementById('tab-btn-' + t).classList.remove('active');
+    });
+    document.getElementById('tab-' + tab).style.display = 'block';
+    document.getElementById('tab-btn-' + tab).classList.add('active');
+}
+</script>
+{% endblock %}

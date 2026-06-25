@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Create Doctor — PLASU Health Access{% endblock %}
+
+{% block content %}
+<div class="plasu-page-bg">
+  <div class="plasu-overlay"></div>
+  <div class="plasu-orb-gold"></div>
+  <div class="plasu-orb-green"></div>
+  <div class="plasu-layout">
+    <div class="plasu-sidebar" style="width:260px;min-width:260px;">
+      <div class="plasu-brand">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU" class="plasu-brand-logo">
+          <div><div class="plasu-brand-name">PLASU</div><div class="plasu-brand-sub">Health Access System</div></div>
+        </div>
+        <div class="plasu-user-pill">
+          <div class="plasu-user-avatar" style="background:linear-gradient(135deg,#2B7258,#FFC53A);"><i class="fas fa-user-shield" style="font-size:0.85rem;"></i></div>
+          <div><div class="plasu-user-name">{{ request.user.username }}</div><div class="plasu-user-role">Administrator</div></div>
+        </div>
+      </div>
+      <nav class="px-3 py-3">
+        <div class="plasu-nav-section">Main Menu</div>
+        <a href="{% url 'admin_dashboard' %}" class="plasu-nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{% url 'all_patients' %}" class="plasu-nav-link"><i class="fas fa-users"></i> All Patients</a>
+        <a href="{% url 'all_doctors' %}" class="plasu-nav-link"><i class="fas fa-user-md"></i> All Doctors</a>
+        <div class="plasu-nav-section mt-3">Management</div>
+        <a href="{% url 'create_admin' %}" class="plasu-nav-link"><i class="fas fa-user-shield"></i> Create Admin</a>
+        <a href="{% url 'create_doctor' %}" class="plasu-nav-link active"><i class="fas fa-user-plus"></i> Create Doctor</a>
+        <a href="{% url 'create_patient' %}" class="plasu-nav-link"><i class="fas fa-user-plus"></i> Create Patient</a>
+        <div class="plasu-nav-section mt-3">Account</div>
+        <a href="{% url 'change_password' %}" class="plasu-nav-link"><i class="fas fa-key"></i> Change Password</a>
+        <a href="{% url 'logout_view' %}" class="plasu-nav-link plasu-nav-logout mt-1"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </nav>
+    </div>
+
+    <div class="plasu-main">
+      <div class="plasu-topbar">
+        <div>
+          <div class="plasu-topbar-sub">Management</div>
+          <h4 class="plasu-topbar-title">Create New Doctor</h4>
+        </div>
+        <a href="{% url 'all_doctors' %}" class="plasu-action-btn-ghost"><i class="fas fa-arrow-left me-2"></i>Back</a>
+      </div>
+
+      <div class="plasu-form-card">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="plasu-label">Full Name</label>
+              <div class="plasu-input-group">
+                <span class="plasu-input-icon"><i class="fas fa-user"></i></span>
+                <input type="text" name="full_name" class="plasu-input" placeholder="Doctor's full name" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="plasu-label">Username</label>
+              <div class="plasu-input-group">
+                <span class="plasu-input-icon"><i class="fas fa-at"></i></span>
+                <input type="text" name="username" class="plasu-input" placeholder="Login username" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="plasu-label">Email Address</label>
+              <div class="plasu-input-group">
+                <span class="plasu-input-icon"><i class="fas fa-envelope"></i></span>
+                <input type="email" name="email" class="plasu-input" placeholder="Email address" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="plasu-label">Phone Number</label>
+              <div class="plasu-input-group">
+                <span class="plasu-input-icon"><i class="fas fa-phone"></i></span>
+                <input type="text" name="phone" class="plasu-input" placeholder="Phone number" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="plasu-label">Specialization</label>
+              <div class="plasu-input-group">
+                <span class="plasu-input-icon"><i class="fas fa-stethoscope"></i></span>
+                <input type="text" name="specialization" class="plasu-input" placeholder="e.g. Cardiologist" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="plasu-label">Password</label>
+              <div class="plasu-input-group">
+                <span class="plasu-input-icon"><i class="fas fa-lock"></i></span>
+                <input type="text" name="phone" class="reg-input"
+                  placeholder="e.g. 08012345678 or +2348012345678"
+                  pattern="^(\+234|0)[0-9]{10}$"
+                  title="Use format: 08012345678 or +2348012345678"
+                  required>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mt-4">
+            <button type="submit" class="plasu-action-btn" style="padding:11px 28px;">
+              <i class="fas fa-user-plus me-2"></i> Create Doctor
+            </button>
+            <a href="{% url 'admin_dashboard' %}" class="plasu-action-btn-ghost" style="padding:11px 20px;">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% include 'partials/plasu_dashboard_styles.html' %}
+{% endblock %}

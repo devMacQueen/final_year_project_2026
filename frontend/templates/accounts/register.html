@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Register — PLASU Health Access System{% endblock %}
+
+{% block extra_head %}
+<style>
+.register-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 40px 0;
+    position: relative;
+    background:
+        linear-gradient(155deg, rgba(11,25,17,0.55) 0%, rgba(20,58,38,0.50) 50%, rgba(8,18,12,0.60) 100%),
+        url("{% static 'images/clinic-bg.jpg' %}") center / cover no-repeat;
+}
+.register-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+    background-size: 55px 55px;
+    pointer-events: none;
+}
+.reg-orb-1 {
+    position: absolute; top: -120px; right: -120px;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,197,58,0.07) 0%, transparent 60%);
+    pointer-events: none;
+}
+.reg-orb-2 {
+    position: absolute; bottom: -80px; left: -60px;
+    width: 380px; height: 380px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(43,114,88,0.14) 0%, transparent 60%);
+    pointer-events: none;
+}
+.reg-card {
+    background: rgba(14,38,26,0.82);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 36px 40px;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+    animation: fadeUp 0.7s ease both;
+    position: relative;
+    z-index: 1;
+}
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.reg-input-group {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 11px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.reg-input-group:focus-within {
+    border-color: rgba(43,114,88,0.6);
+    box-shadow: 0 0 0 3px rgba(43,114,88,0.12);
+}
+.reg-input-icon {
+    padding: 0 13px;
+    color: rgba(255,197,58,0.6);
+    font-size: 0.82rem;
+    flex-shrink: 0;
+}
+.reg-input, .reg-select {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 12px 12px 12px 0;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.86rem;
+    width: 100%;
+}
+.reg-input::placeholder { color: rgba(255,255,255,0.27); }
+.reg-select option { background: #122a1c; color: #fff; }
+.reg-select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+.reg-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+}
+.step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--plasu-green), var(--plasu-green-mid));
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+.section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 22px 0 18px;
+    color: rgba(255,255,255,0.35);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.section-divider::before,
+.section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+}
+input[type="date"].reg-input::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(0.4);
+    cursor: pointer;
+}
+.reg-textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 12px 12px 12px 0;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.86rem;
+    width: 100%;
+    resize: none;
+}
+.reg-textarea::placeholder { color: rgba(255,255,255,0.27); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-page">
+    <div class="reg-orb-1"></div>
+    <div class="reg-orb-2"></div>
+
+    <div class="container" style="position:relative;z-index:1;">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-9 col-md-11">
+                <div class="reg-card">
+
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU"
+                             style="width:62px;height:62px;object-fit:contain;background:#fff;border-radius:50%;
+                                    padding:6px;box-shadow:0 4px 20px rgba(255,197,58,0.3);margin-bottom:14px;">
+                        <h2 style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.6rem;color:#fff;margin-bottom:4px;">
+                            Student Registration
+                        </h2>
+                        <p style="font-size:0.8rem;color:rgba(255,255,255,0.45);">
+                            PLASU Health Access System — Create your account
+                        </p>
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <!-- ── Section 1: Personal Information ── -->
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="reg-label">Full Name</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-user"></i></span>
+                                    <input type="text" name="full_name" class="reg-input" placeholder="Enter your full name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="reg-label">Username</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-at"></i></span>
+                                    <input type="text" name="username" class="reg-input" placeholder="Choose a username" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="reg-label">Email Address</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" name="email" class="reg-input" placeholder="macqueen@gmail.com" required>
+                                </div>
+                                <div style="font-size:0.68rem;color:rgba(255,255,255,0.3);margin-top:4px;">
+                                    Used to receive your smartcard login verification code
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="reg-label">Phone Number</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-phone"></i></span>
+                                    <input type="text" name="phone" class="reg-input"
+                                        placeholder="e.g. 08012345678 or +2348012345678"
+                                        pattern="^(\+234|0)[0-9]{10}$"
+                                        title="Use format: 08012345678 or +2348012345678"
+                                        required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="reg-label">Date of Birth</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-calendar"></i></span>
+                                    <input type="date" name="date_of_birth" class="reg-input" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="reg-label">Gender</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-venus-mars"></i></span>
+                                    <select name="gender" class="reg-select" required>
+                                        <option value="">— Select Gender —</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="reg-label">Home Address</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-map-marker-alt"></i></span>
+                                    <input type="text" name="address" class="reg-input" placeholder="Your home address" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── Section 2: Academic Details ── -->
+                        <div class="section-divider">
+                            <span class="step-badge">2</span> Academic Details
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="reg-label">Matric Number</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-id-badge"></i></span>
+                                    <input type="text" name="matric_number" class="reg-input"
+                                           placeholder="e.g. PLASU/2020/FNAS/0241" required
+                                           style="font-family:'DM Mono',monospace;font-size:0.82rem;">
+                                </div>
+                                <div style="font-size:0.68rem;color:rgba(255,255,255,0.3);margin-top:4px;">
+                                    Format: PLASU/YEAR/FACULTY/NUMBER
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="reg-label">Faculty</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-university"></i></span>
+                                    <select name="faculty" class="reg-select" required>
+                                        <option value="">— Select Faculty —</option>
+                                        {% for code, name in faculties %}
+                                        <option value="{{ code }}">{{ code }} — {{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── Section 3: Medical History ── -->
+                        <div class="section-divider">
+                            <span class="step-badge">3</span> Medical History
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="reg-label">Blood Group</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-tint"></i></span>
+                                    <select name="blood_group" class="reg-select">
+                                        <option value="">— Select Blood Group —</option>
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A-</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B-</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB-</option>
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O-</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="reg-label">Genotype</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-dna"></i></span>
+                                    <select name="genotype" class="reg-select">
+                                        <option value="">— Select Genotype —</option>
+                                        <option value="AA">AA</option>
+                                        <option value="AS">AS</option>
+                                        <option value="SS">SS</option>
+                                        <option value="AC">AC</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="reg-label">
+                                    Known Allergies
+                                    <span style="color:rgba(255,255,255,0.3);font-weight:400;">(optional)</span>
+                                </label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-allergies"></i></span>
+                                    <input type="text" name="allergies" class="reg-input"
+                                           placeholder="e.g. Penicillin, Peanuts, Dust, Pollen">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="reg-label">
+                                    Chronic Conditions
+                                    <span style="color:rgba(255,255,255,0.3);font-weight:400;">(optional)</span>
+                                </label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-heartbeat"></i></span>
+                                    <input type="text" name="chronic_conditions" class="reg-input"
+                                           placeholder="e.g. Diabetes, Asthma, Hypertension, Epilepsy">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="reg-label">
+                                    Current Medications
+                                    <span style="color:rgba(255,255,255,0.3);font-weight:400;">(optional)</span>
+                                </label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-pills"></i></span>
+                                    <input type="text" name="current_medications" class="reg-input"
+                                           placeholder="e.g. Metformin 500mg, Ventolin inhaler">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── Section 4: Emergency Contact ── -->
+                        <div class="section-divider">
+                            <span class="step-badge">4</span> Emergency Contact
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="reg-label">Contact Full Name</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-user-friends"></i></span>
+                                    <input type="text" name="emergency_contact_name" class="reg-input"
+                                           placeholder="Emergency contact full name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="reg-label">Contact Phone</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-phone-alt"></i></span>
+                                    <input type="text" name="emergency_contact_phone" class="reg-input"
+                                           placeholder="e.g. 08012345678" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="reg-label">Relationship</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-heart"></i></span>
+                                    <select name="emergency_contact_relationship" class="reg-select" required>
+                                        <option value="">— Select Relationship —</option>
+                                        <option value="Parent">Parent</option>
+                                        <option value="Sibling">Sibling</option>
+                                        <option value="Spouse">Spouse</option>
+                                        <option value="Guardian">Guardian</option>
+                                        <option value="Friend">Friend</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── Section 5: Security ── -->
+                        <div class="section-divider">
+                            <span class="step-badge">5</span> Security
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="reg-label">Password</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-lock"></i></span>
+                                    <input type="password" name="password" class="reg-input" placeholder="Create password" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="reg-label">Confirm Password</label>
+                                <div class="reg-input-group">
+                                    <span class="reg-input-icon"><i class="fas fa-lock"></i></span>
+                                    <input type="password" name="confirm_password" class="reg-input" placeholder="Repeat password" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info note -->
+                        <div style="background:rgba(43,114,88,0.12);border:1px solid rgba(43,114,88,0.25);
+                                    border-left:3px solid var(--plasu-green-light);border-radius:10px;
+                                    padding:12px 16px;margin-top:20px;margin-bottom:24px;font-size:0.8rem;
+                                    color:rgba(255,255,255,0.65);">
+                            <i class="fas fa-info-circle me-2" style="color:var(--plasu-green-light);"></i>
+                            After registration, visit the admin office to receive your
+                            <strong style="color:#fff;">Smartcard ID</strong> and
+                            <strong style="color:#fff;">Biometric PIN</strong>.
+                        </div>
+
+                        <div class="d-flex gap-3 align-items-center">
+                            <button type="submit" class="plasu-btn-gold">
+                                <i class="fas fa-user-plus"></i> Create Account
+                            </button>
+                            <a href="{% url 'login_page' %}" style="font-size:0.82rem;color:rgba(255,255,255,0.45);text-decoration:none;">
+                                Already registered?
+                                <span style="color:var(--plasu-gold);font-weight:600;">Login</span>
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

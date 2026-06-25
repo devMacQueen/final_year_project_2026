@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Verify Reset Code — PLASU Health Access System{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex flex-column" style="
+  background: url('{% static 'images/clinic_bg.jpg' %}') center center / cover no-repeat;
+  position: relative;">
+
+  <div style="position:absolute;inset:0;
+    background:linear-gradient(135deg,rgba(26,82,57,0.93) 0%,rgba(43,114,88,0.80) 55%,rgba(20,38,28,0.96) 100%);
+    z-index:0;"></div>
+  <div style="position:absolute;top:-100px;right:-100px;width:420px;height:420px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,197,58,0.14) 0%,transparent 70%);z-index:0;pointer-events:none;"></div>
+
+  <!-- Navbar -->
+  <div style="position:relative;z-index:2;border-bottom:1px solid rgba(255,255,255,0.1);">
+    <div class="container py-3 d-flex align-items-center gap-3">
+      <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU"
+        style="width:44px;height:44px;object-fit:contain;background:#fff;border-radius:50%;padding:4px;
+               box-shadow:0 2px 12px rgba(255,197,58,0.4);">
+      <div>
+        <div style="font-family:'Georgia',serif;font-size:0.72rem;color:#FFC53A;letter-spacing:2px;text-transform:uppercase;font-weight:700;">Plateau State University</div>
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.6);">Health Access System</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container d-flex align-items-center justify-content-center flex-grow-1 py-5"
+    style="position:relative;z-index:2;">
+    <div style="width:100%;max-width:460px;">
+
+      <!-- Header -->
+      <div class="text-center mb-3" style="animation:fadeDown 0.7s ease both;">
+        <div style="width:82px;height:82px;border-radius:50%;margin:0 auto 14px;
+          background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);
+          border:1.5px solid rgba(255,197,58,0.45);
+          display:flex;align-items:center;justify-content:center;
+          box-shadow:0 0 30px rgba(255,197,58,0.2),0 8px 24px rgba(0,0,0,0.25);">
+          <i class="fas fa-shield-alt" style="font-size:2rem;color:#FFC53A;"></i>
+        </div>
+        <h5 style="font-family:'Georgia',serif;font-weight:700;color:#fff;margin-bottom:4px;">
+          Enter Reset Code
+        </h5>
+        <p style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin:0;">
+          Check your email <strong style="color:#FFC53A;">{{ email }}</strong> for the 6-digit code.
+        </p>
+      </div>
+
+      <!-- Glass panel -->
+      <div class="fp-panel p-4" style="animation:fadeUp 0.8s 0.1s ease both;">
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="fp-alert {% if message.tags == 'error' %}fp-alert-error{% else %}fp-alert-success{% endif %} mb-3">
+          <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% else %}check-circle{% endif %} me-2"></i>
+          {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Countdown ring -->
+        <div class="text-center mb-3">
+          <div style="position:relative;width:80px;height:80px;margin:0 auto 6px;">
+            <svg width="80" height="80" style="transform:rotate(-90deg);">
+              <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="5"/>
+              <circle id="timer-arc" cx="40" cy="40" r="34"
+                fill="none" stroke="#FFC53A" stroke-width="5"
+                stroke-dasharray="213.6" stroke-dashoffset="0"
+                stroke-linecap="round" style="transition:stroke-dashoffset 1s linear,stroke 0.5s;"/>
+            </svg>
+            <div id="timer-display" style="position:absolute;top:50%;left:50%;
+              transform:translate(-50%,-50%);font-family:'Georgia',serif;
+              font-size:1.1rem;font-weight:700;color:#FFC53A;">5:00</div>
+          </div>
+          <div id="timer-label" style="font-size:0.7rem;color:rgba(255,255,255,0.4);
+            letter-spacing:1px;text-transform:uppercase;">Expires in</div>
+          <div id="expired-msg" style="display:none;" class="fp-alert fp-alert-error mt-2">
+            Code expired.
+            <a href="{% url 'forgot_password' %}" style="color:#ff9090;font-weight:700;">
+              Request a new one
+            </a>
+          </div>
+        </div>
+
+        <!-- OTP form -->
+        <form method="POST" id="otp-form">
+          {% csrf_token %}
+          <div class="mb-4">
+            <label class="fp-label">6-Digit Reset Code</label>
+            <div class="d-flex gap-2 justify-content-center">
+              <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" tabindex="1">
+              <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" tabindex="2">
+              <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" tabindex="3">
+              <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" tabindex="4">
+              <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" tabindex="5">
+              <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" tabindex="6">
+            </div>
+            <input type="hidden" name="otp_code" id="otp-hidden">
+          </div>
+
+          <button type="submit" id="verify-btn" class="fp-submit-btn w-100 py-3 mb-3" disabled>
+            <i class="fas fa-check-circle me-2"></i> Verify Code
+          </button>
+        </form>
+
+        <div class="text-center mb-3">
+          <a href="{% url 'forgot_password' %}"
+            style="font-size:0.8rem;color:rgba(255,255,255,0.45);text-decoration:none;">
+            Didn't get the email?
+            <span style="color:#FFC53A;font-weight:600;">Resend</span>
+          </a>
+        </div>
+
+        <a href="{% url 'login_page' %}" class="fp-back-link w-100 d-block text-center py-2">
+          <i class="fas fa-arrow-left me-2"></i> Back to Login
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.fp-panel {
+  background:rgba(255,255,255,0.09);backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,0.18);
+  border-radius:22px;box-shadow:0 12px 48px rgba(0,0,0,0.35),
+  inset 0 1px 0 rgba(255,255,255,0.13);
+}
+.fp-label {
+  font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.7);
+  margin-bottom:10px;display:block;letter-spacing:0.8px;
+  text-transform:uppercase;text-align:center;
+}
+.otp-digit {
+  width:44px;height:54px;border-radius:12px;
+  background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);
+  color:#fff;font-size:1.4rem;font-weight:700;text-align:center;outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
+  font-family:'Georgia',serif;
+}
+.otp-digit:focus { border-color:#FFC53A;box-shadow:0 0 0 3px rgba(255,197,58,0.18);background:rgba(255,197,58,0.08); }
+.otp-digit.filled { border-color:rgba(43,114,88,0.7);background:rgba(43,114,88,0.15); }
+.fp-submit-btn {
+  background:linear-gradient(135deg,#FFC53A,#e0a800);color:#1a3a2a;
+  border:none;border-radius:12px;font-weight:700;font-size:1rem;
+  cursor:pointer;transition:all 0.25s;box-shadow:0 4px 20px rgba(255,197,58,0.4);
+}
+.fp-submit-btn:not(:disabled):hover { transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,197,58,0.55); }
+.fp-submit-btn:disabled { opacity:0.4;cursor:not-allowed; }
+.fp-back-link {
+  border:1.5px solid rgba(255,255,255,0.18);border-radius:12px;
+  color:rgba(255,255,255,0.65)!important;text-decoration:none;
+  font-size:0.84rem;font-weight:600;transition:all 0.2s;
+}
+.fp-back-link:hover { background:rgba(255,255,255,0.08);color:#fff!important;border-color:rgba(255,197,58,0.4); }
+.fp-alert { border-radius:10px;padding:10px 14px;font-size:0.82rem; }
+.fp-alert-error { background:rgba(220,53,69,0.14);border:1px solid rgba(220,53,69,0.3);color:#ff9090; }
+.fp-alert-success { background:rgba(43,114,88,0.18);border:1px solid rgba(43,114,88,0.38);color:#a7f3d0; }
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp  {from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)}}
+</style>
+
+<script>
+const digits     = Array.from(document.querySelectorAll('.otp-digit'));
+const hidden     = document.getElementById('otp-hidden');
+const verifyBtn  = document.getElementById('verify-btn');
+
+digits.forEach((box, i) => {
+  box.addEventListener('input', () => {
+    box.value = box.value.replace(/\D/g,'').slice(-1);
+    box.classList.toggle('filled', !!box.value);
+    if (box.value && i < digits.length-1) digits[i+1].focus();
+    sync();
+  });
+  box.addEventListener('keydown', e => {
+    if (e.key==='Backspace' && !box.value && i>0) {
+      digits[i-1].focus(); digits[i-1].value='';
+      digits[i-1].classList.remove('filled'); sync();
+    }
+  });
+  box.addEventListener('paste', e => {
+    e.preventDefault();
+    const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+    txt.split('').forEach((ch,j)=>{ if(digits[j]){digits[j].value=ch;digits[j].classList.add('filled');} });
+    digits[Math.min(txt.length,digits.length-1)].focus(); sync();
+  });
+});
+function sync() {
+  const code=digits.map(d=>d.value).join('');
+  hidden.value=code; verifyBtn.disabled=code.length!==6;
+}
+document.addEventListener('DOMContentLoaded',()=>{ if(digits[0]) digits[0].focus(); });
+
+// Countdown
+(function(){
+  const TOTAL={{ seconds_remaining|default:300 }};
+  const FULL=213.6;
+  const arc=document.getElementById('timer-arc');
+  const disp=document.getElementById('timer-display');
+  const lbl=document.getElementById('timer-label');
+  const exp=document.getElementById('expired-msg');
+  let rem=TOTAL;
+  function tick(){
+    if(rem<0)rem=0;
+    const m=Math.floor(rem/60),s=rem%60;
+    disp.textContent=`${m}:${s.toString().padStart(2,'0')}`;
+    arc.style.strokeDashoffset=FULL*(1-rem/300);
+    if(rem>120){arc.style.stroke='#FFC53A';disp.style.color='#FFC53A';}
+    else if(rem>30){arc.style.stroke='#ef6c00';disp.style.color='#ef6c00';}
+    else{arc.style.stroke='#e53935';disp.style.color='#e53935';}
+    if(rem<=0){
+      lbl.textContent='Code expired';exp.style.display='block';
+      verifyBtn.disabled=true;verifyBtn.innerHTML='Code Expired';
+      digits.forEach(d=>{d.disabled=true;d.style.opacity='0.4';});
+      return;
+    }
+    rem--; setTimeout(tick,1000);
+  }
+  tick();
+})();
+</script>
+{% endblock %}

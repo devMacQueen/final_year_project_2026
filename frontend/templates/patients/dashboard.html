@@ -1,0 +1,452 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Patient Dashboard — PLASU Health Access System{% endblock %}
+
+{% block extra_head %}
+<style>
+.dash-page {
+    min-height: 100vh;
+    position: relative;
+    background:
+        linear-gradient(155deg, rgba(11,25,17,0.93) 0%, rgba(20,58,38,0.88) 50%, rgba(8,18,12,0.97) 100%),
+        url("{% static 'images/clinic-bg.jpg' %}") center / cover no-repeat fixed;
+}
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.info-item {
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    padding: 12px 14px;
+}
+.info-label {
+    font-size: 0.62rem;
+    color: rgba(255,197,58,0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+.info-value {
+    font-size: 0.84rem;
+    color: #fff;
+    font-weight: 500;
+}
+.info-value.empty {
+    color: rgba(255,255,255,0.3);
+    font-style: italic;
+    font-weight: 400;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-page">
+  <div style="position:fixed;inset:0;
+    background:linear-gradient(145deg,rgba(11,25,17,0.93) 0%,rgba(18,50,34,0.88) 50%,rgba(9,22,15,0.97) 100%);
+    z-index:0;pointer-events:none;"></div>
+  <div style="position:fixed;top:-140px;right:-140px;width:520px;height:520px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,197,58,0.08) 0%,transparent 65%);z-index:0;pointer-events:none;"></div>
+  <div style="position:fixed;bottom:-100px;left:180px;width:420px;height:420px;border-radius:50%;
+    background:radial-gradient(circle,rgba(43,114,88,0.14) 0%,transparent 65%);z-index:0;pointer-events:none;"></div>
+
+  <div style="position:relative;z-index:1;display:flex;min-height:100vh;">
+
+    <!-- SIDEBAR -->
+    <div class="plasu-sidebar" style="width:260px;min-width:260px;">
+      <div class="plasu-brand">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{% static 'images/plasu_logo.png' %}" alt="PLASU" class="plasu-brand-logo">
+          <div>
+            <div class="plasu-brand-name">PLASU</div>
+            <div class="plasu-brand-sub">Health Access System</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+          border-radius:12px;padding:10px 12px;margin-top:12px;">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="plasu-user-avatar" style="background:linear-gradient(135deg,#2B7258,#FFC53A);width:34px;height:34px;">
+              <i class="fas fa-user" style="font-size:0.82rem;"></i>
+            </div>
+            <div>
+              <div class="plasu-user-name" style="font-size:0.72rem;">{{ patient.full_name }}</div>
+              <div class="plasu-user-role">Patient Portal</div>
+            </div>
+          </div>
+          <div style="padding-top:7px;border-top:1px solid rgba(255,255,255,0.08);
+            font-size:0.65rem;color:rgba(255,255,255,0.4);">
+            <i class="fas fa-id-badge me-1" style="color:var(--plasu-gold);"></i>
+            {{ patient.matric_number|default:"No matric assigned" }}
+          </div>
+        </div>
+      </div>
+      <nav class="px-3 py-3">
+        <div class="plasu-nav-section">Main Menu</div>
+        <a href="{% url 'patient_dashboard' %}" class="plasu-nav-link active">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{% url 'book_appointment' %}" class="plasu-nav-link">
+          <i class="fas fa-calendar-plus"></i> Book Appointment
+        </a>
+        <a href="{% url 'virtual_card' %}" class="plasu-nav-link">
+          <i class="fas fa-id-card"></i> My Health Card
+        </a>
+        <div class="plasu-nav-section mt-3">Account</div>
+        <a href="{% url 'logout_view' %}" class="plasu-nav-link plasu-nav-logout mt-1">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </nav>
+    </div>
+
+    <!-- MAIN -->
+    <div class="plasu-main">
+
+      <!-- Top bar -->
+      <div class="plasu-topbar">
+        <div>
+          <div class="plasu-topbar-sub">Welcome back</div>
+          <h4 class="plasu-topbar-title">{{ patient.full_name }}</h4>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <div class="plasu-topbar-date">
+            <i class="fas fa-clock me-1" style="color:var(--plasu-gold);"></i>
+            {% now "l, d M Y" %}
+          </div>
+          <a href="{% url 'virtual_card' %}" class="plasu-action-btn">
+            <i class="fas fa-id-card me-2"></i> My Card
+          </a>
+        </div>
+      </div>
+
+      <!-- Status Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4 col-sm-6">
+          <div class="plasu-stat-card">
+            <div class="plasu-stat-icon" style="background:linear-gradient(135deg,#2B7258,#3d9970);">
+              <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="plasu-stat-num" style="font-size:1rem;margin-bottom:3px;">{{ patient.gender|capfirst }}</div>
+            <div class="plasu-stat-label">{{ patient.get_faculty_display }}</div>
+            <div class="plasu-stat-bar" style="background:rgba(43,114,88,0.4);"></div>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+          <div class="plasu-stat-card">
+            {% if has_smartcard %}
+            <div class="plasu-stat-icon" style="background:linear-gradient(135deg,#2B7258,#3d9970);">
+              <i class="fas fa-id-card"></i>
+            </div>
+            <div class="plasu-stat-num" style="font-size:0.88rem;font-family:'DM Mono',monospace;letter-spacing:1px;">
+              {{ patient.smartcard_id }}
+            </div>
+            <div class="plasu-stat-label">Smartcard Active ✅</div>
+            <div class="plasu-stat-bar" style="background:rgba(43,114,88,0.4);"></div>
+            {% else %}
+            <div class="plasu-stat-icon" style="background:linear-gradient(135deg,#e65100,#ef6c00);">
+              <i class="fas fa-id-card"></i>
+            </div>
+            <div class="plasu-stat-num" style="font-size:0.88rem;">Not Assigned</div>
+            <div class="plasu-stat-label">Visit admin office</div>
+            <div class="plasu-stat-bar" style="background:rgba(239,108,0,0.4);"></div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+          <div class="plasu-stat-card">
+            {% if has_biometric %}
+            <div class="plasu-stat-icon" style="background:linear-gradient(135deg,#2B7258,#3d9970);">
+              <i class="fas fa-fingerprint"></i>
+            </div>
+            <div class="plasu-stat-num" style="font-size:0.88rem;">Biometric Active</div>
+            <div class="plasu-stat-label">PIN Login Enabled ✅</div>
+            <div class="plasu-stat-bar" style="background:rgba(43,114,88,0.4);"></div>
+            {% else %}
+            <div class="plasu-stat-icon" style="background:linear-gradient(135deg,#b71c1c,#e53935);">
+              <i class="fas fa-fingerprint"></i>
+            </div>
+            <div class="plasu-stat-num" style="font-size:0.88rem;">Not Assigned</div>
+            <div class="plasu-stat-label">Visit admin office</div>
+            <div class="plasu-stat-bar" style="background:rgba(229,57,53,0.4);"></div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Warning -->
+      {% if not has_smartcard or not has_biometric %}
+      <div class="plasu-alert-warning mb-4">
+        <i class="fas fa-exclamation-triangle me-2" style="color:var(--plasu-gold);"></i>
+        <strong style="color:var(--plasu-gold);">Action Required:</strong>
+        <span style="color:rgba(255,255,255,0.75);">
+          Please visit the admin office to get your
+          {% if not has_smartcard %}Smartcard{% endif %}
+          {% if not has_smartcard and not has_biometric %} and {% endif %}
+          {% if not has_biometric %}Biometric PIN{% endif %}
+          assigned.
+        </span>
+      </div>
+      {% endif %}
+
+      <!-- Quick actions -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <a href="{% url 'book_appointment' %}"
+             style="display:flex;align-items:center;gap:14px;
+                    background:rgba(16,40,26,0.7);border:1px solid rgba(255,255,255,0.08);
+                    border-radius:14px;padding:18px;text-decoration:none;transition:all 0.2s;"
+             onmouseover="this.style.background='rgba(43,114,88,0.2)';this.style.borderColor='rgba(43,114,88,0.3)'"
+             onmouseout="this.style.background='rgba(16,40,26,0.7)';this.style.borderColor='rgba(255,255,255,0.08)'">
+            <div style="width:44px;height:44px;border-radius:12px;flex-shrink:0;
+              background:linear-gradient(135deg,#e65100,#ef6c00);
+              display:flex;align-items:center;justify-content:center;">
+              <i class="fas fa-calendar-plus" style="color:#fff;font-size:1rem;"></i>
+            </div>
+            <div>
+              <div style="font-weight:600;color:#fff;font-size:0.88rem;">Book Appointment</div>
+              <div style="font-size:0.73rem;color:rgba(255,255,255,0.4);">Schedule a clinic visit</div>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="{% url 'virtual_card' %}"
+             style="display:flex;align-items:center;gap:14px;
+                    background:rgba(16,40,26,0.7);border:1px solid rgba(255,255,255,0.08);
+                    border-radius:14px;padding:18px;text-decoration:none;transition:all 0.2s;"
+             onmouseover="this.style.background='rgba(43,114,88,0.2)';this.style.borderColor='rgba(43,114,88,0.3)'"
+             onmouseout="this.style.background='rgba(16,40,26,0.7)';this.style.borderColor='rgba(255,255,255,0.08)'">
+            <div style="width:44px;height:44px;border-radius:12px;flex-shrink:0;
+              background:linear-gradient(135deg,#2B7258,#3d9970);
+              display:flex;align-items:center;justify-content:center;">
+              <i class="fas fa-id-card" style="color:#fff;font-size:1rem;"></i>
+            </div>
+            <div>
+              <div style="font-weight:600;color:#fff;font-size:0.88rem;">View Health Card</div>
+              <div style="font-size:0.73rem;color:rgba(255,255,255,0.4);">Print or view your card</div>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <div style="display:flex;align-items:center;gap:14px;
+                    background:rgba(16,40,26,0.7);border:1px solid rgba(255,255,255,0.08);
+                    border-radius:14px;padding:18px;">
+            <div style="width:44px;height:44px;border-radius:12px;flex-shrink:0;
+              background:linear-gradient(135deg,#1565c0,#1e88e5);
+              display:flex;align-items:center;justify-content:center;">
+              <i class="fas fa-notes-medical" style="color:#fff;font-size:1rem;"></i>
+            </div>
+            <div>
+              <div style="font-weight:600;color:#fff;font-size:0.88rem;">{{ records|length }} Records</div>
+              <div style="font-size:0.73rem;color:rgba(255,255,255,0.4);">Medical history below</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Medical History ── -->
+      <div class="plasu-glass-card mb-4">
+        <div class="plasu-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:32px;height:32px;border-radius:8px;
+              background:linear-gradient(135deg,#7b1fa2,#ab47bc);
+              display:flex;align-items:center;justify-content:center;">
+              <i class="fas fa-heartbeat" style="font-size:0.78rem;color:#fff;"></i>
+            </div>
+            <span>My Health Profile</span>
+          </div>
+        </div>
+        <div class="plasu-card-body">
+          <div class="row g-3">
+
+            <!-- Personal Health -->
+            <div class="col-md-6">
+              <div style="font-size:0.68rem;color:rgba(255,197,58,0.6);text-transform:uppercase;
+                          letter-spacing:1.5px;margin-bottom:10px;font-weight:600;">
+                <i class="fas fa-tint me-1"></i> Basic Health Info
+              </div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">Blood Group</div>
+                  <div class="info-value {% if not patient.blood_group %}empty{% endif %}">
+                    {{ patient.blood_group|default:"Not provided" }}
+                  </div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Genotype</div>
+                  <div class="info-value {% if not patient.genotype %}empty{% endif %}">
+                    {{ patient.genotype|default:"Not provided" }}
+                  </div>
+                </div>
+                <div class="info-item" style="grid-column:span 2;">
+                  <div class="info-label">Known Allergies</div>
+                  <div class="info-value {% if not patient.allergies %}empty{% endif %}">
+                    {{ patient.allergies|default:"None reported" }}
+                  </div>
+                </div>
+                <div class="info-item" style="grid-column:span 2;">
+                  <div class="info-label">Chronic Conditions</div>
+                  <div class="info-value {% if not patient.chronic_conditions %}empty{% endif %}">
+                    {{ patient.chronic_conditions|default:"None reported" }}
+                  </div>
+                </div>
+                <div class="info-item" style="grid-column:span 2;">
+                  <div class="info-label">Current Medications</div>
+                  <div class="info-value {% if not patient.current_medications %}empty{% endif %}">
+                    {{ patient.current_medications|default:"None" }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Emergency Contact -->
+            <div class="col-md-6">
+              <div style="font-size:0.68rem;color:rgba(255,197,58,0.6);text-transform:uppercase;
+                          letter-spacing:1.5px;margin-bottom:10px;font-weight:600;">
+                <i class="fas fa-phone-alt me-1"></i> Emergency Contact
+              </div>
+              <div class="info-grid">
+                <div class="info-item" style="grid-column:span 2;">
+                  <div class="info-label">Contact Name</div>
+                  <div class="info-value {% if not patient.emergency_contact_name %}empty{% endif %}">
+                    {{ patient.emergency_contact_name|default:"Not provided" }}
+                  </div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Phone</div>
+                  <div class="info-value {% if not patient.emergency_contact_phone %}empty{% endif %}">
+                    {{ patient.emergency_contact_phone|default:"—" }}
+                  </div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Relationship</div>
+                  <div class="info-value {% if not patient.emergency_contact_relationship %}empty{% endif %}">
+                    {{ patient.emergency_contact_relationship|default:"—" }}
+                  </div>
+                </div>
+                <!-- Personal details -->
+                <div class="info-item">
+                  <div class="info-label">Date of Birth</div>
+                  <div class="info-value">{{ patient.date_of_birth }}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Phone</div>
+                  <div class="info-value">{{ patient.phone }}</div>
+                </div>
+                <div class="info-item" style="grid-column:span 2;">
+                  <div class="info-label">Address</div>
+                  <div class="info-value">{{ patient.address }}</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Medical Records ── -->
+      <div class="plasu-glass-card mb-4">
+        <div class="plasu-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:32px;height:32px;border-radius:8px;
+              background:linear-gradient(135deg,#1565c0,#1e88e5);
+              display:flex;align-items:center;justify-content:center;">
+              <i class="fas fa-notes-medical" style="font-size:0.78rem;color:#fff;"></i>
+            </div>
+            <span>My Medical Records</span>
+          </div>
+          <span class="plasu-badge-count">{{ records|length }}</span>
+        </div>
+        <div class="plasu-card-body">
+          <div class="table-responsive">
+            <table class="plasu-table">
+              <thead>
+                <tr><th>Date</th><th>Doctor</th><th>Diagnosis</th><th>Prescription</th></tr>
+              </thead>
+              <tbody>
+                {% for record in records %}
+                <tr>
+                  <td>{{ record.created_at|date:"M d, Y" }}</td>
+                  <td style="font-weight:600;color:#fff;">Dr. {{ record.doctor.username }}</td>
+                  <td>{{ record.diagnosis|truncatechars:50 }}</td>
+                  <td>{{ record.prescription|truncatechars:50 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center py-4" style="color:rgba(255,255,255,0.35);">
+                    No medical records yet.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Appointments ── -->
+      <div class="plasu-glass-card mb-4">
+        <div class="plasu-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:32px;height:32px;border-radius:8px;
+              background:linear-gradient(135deg,#e65100,#ef6c00);
+              display:flex;align-items:center;justify-content:center;">
+              <i class="fas fa-calendar" style="font-size:0.78rem;color:#fff;"></i>
+            </div>
+            <span>My Appointments</span>
+          </div>
+          <a href="{% url 'book_appointment' %}" class="plasu-action-btn"
+             style="font-size:0.76rem;padding:5px 14px;">
+            <i class="fas fa-plus me-1"></i> Book New
+          </a>
+        </div>
+        <div class="plasu-card-body">
+          <div class="table-responsive">
+            <table class="plasu-table">
+              <thead>
+                <tr><th>Date</th><th>Time</th><th>Doctor</th><th>Reason</th><th>Status</th><th>Note</th></tr>
+              </thead>
+              <tbody>
+                {% for appointment in appointments %}
+                <tr>
+                  <td>{{ appointment.date }}</td>
+                  <td>{{ appointment.time }}</td>
+                  <td style="font-weight:600;color:#fff;">Dr. {{ appointment.doctor.username }}</td>
+                  <td>{{ appointment.reason|truncatechars:30 }}</td>
+                  <td>
+                    {% if appointment.status == 'pending' %}
+                    <span class="plasu-badge plasu-badge-warning">Pending</span>
+                    {% elif appointment.status == 'approved' %}
+                    <span class="plasu-badge plasu-badge-success">Approved ✅</span>
+                    {% else %}
+                    <span class="plasu-badge plasu-badge-danger">Declined ❌</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if appointment.decline_reason %}
+                    <small style="color:#ff9090;">{{ appointment.decline_reason }}</small>
+                    {% else %}
+                    <span style="color:rgba(255,255,255,0.25);">—</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-4" style="color:rgba(255,255,255,0.35);">
+                    No appointments yet.
+                    <a href="{% url 'book_appointment' %}" style="color:var(--plasu-gold);margin-left:6px;">Book one now</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div>
+</div>
+
+{% include 'partials/plasu_dashboard_styles.html' %}
+{% endblock %}
+
