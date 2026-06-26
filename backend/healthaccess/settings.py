@@ -5,6 +5,11 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
+ALLOWED_HOSTS = [
+    'final-year-project-2026-jmzz.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = BASE_DIR.parent
