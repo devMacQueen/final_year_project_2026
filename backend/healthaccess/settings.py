@@ -13,18 +13,19 @@ load_dotenv()
 
 # import os
 
-RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+# import os
+
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "plasu-health-acess-system.onrender.com",
     ".onrender.com",
 ]
 
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
 CSRF_TRUSTED_ORIGINS = [
+    "https://plasu-health-acess-system.onrender.com",
     "https://*.onrender.com",
 ]
 
