@@ -5,10 +5,27 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
+# ALLOWED_HOSTS = [
+#     'final-year-project-2026-jmzz.onrender.com',
+#     'localhost',
+#     '127.0.0.1',
+# ]
+
+# import os
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+
 ALLOWED_HOSTS = [
-    'final-year-project-2026-jmzz.onrender.com',
-    'localhost',
-    '127.0.0.1',
+    "localhost",
+    "127.0.0.1",
+    ".onrender.com",
+]
+
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.onrender.com",
 ]
 
 BASE_DIR = Path(__file__).resolve().parent.parent
